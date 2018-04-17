@@ -31,4 +31,10 @@ describe('AppComponent', () => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('h1').textContent).toContain('Voting App');
   }));
+  it('should have title in a nav tag', async() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('nav').textContent).toContain('Voting App');
+  });
 });
