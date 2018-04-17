@@ -6,10 +6,16 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { AppComponent } from './app.component';
 
 import { environment } from '../environments/environment';
+import { AuthComponent } from './auth/auth.component';
+import { CreditsComponent } from './credits/credits.component';
+import { VoteComponent } from './vote/vote.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AuthComponent,
+    CreditsComponent,
+    VoteComponent
   ],
   imports: [
     BrowserModule,
