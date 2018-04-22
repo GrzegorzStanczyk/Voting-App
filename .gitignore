@@ -5,6 +5,7 @@
 /dist-server
 /tmp
 /out-tsc
+/02 NodeJS
 
 # dependencies
 /node_modules
