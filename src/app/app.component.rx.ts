@@ -1,6 +1,5 @@
 import { Action } from '@ngrx/store';
 import { Store, select } from '@ngrx/store';
-import { Observable } from 'rxjs/observable';
 
 interface AppState  {
   id: number;
