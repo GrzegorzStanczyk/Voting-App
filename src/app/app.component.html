@@ -1,13 +1,36 @@
 
-<nav class="navigation">
-  Voting App
+<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+  <a class="navbar-brand" href="#">Voting App</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
   <app-auth></app-auth>
 </nav>
-<header>
-  <h1 class="title">Voting App</h1>
+
+<header class="jumbotron jumbotron-fluid d-flex justify-items-center">
+  <div class="container text-center">
+    <!-- <h1 class="display-4 text-center">Voting App</h1>
+    <p class="lead text-center">Create custom polls with live results.</p> -->
+    <!-- <button type="button" class="btn btn-success">Sign Up</button> -->
+    <h1 class="display-4 text-center">Dashboard</h1>
+    <p class="lead text-center">What would you like to do today?</p>
+    <button type="button" class="btn btn-success">Success</button>
+    <button type="button" class="btn btn-primary">Primary</button>
+  </div>
 </header>
+
 <app-vote></app-vote>
+
+<app-feedback></app-feedback>
+
+<app-poll></app-poll>
+
+<app-result></app-result>
+
+<app-user-polls></app-user-polls>
+
+<app-sign-up></app-sign-up>
+
 <footer>
   <app-credits></app-credits>
 </footer>
-
