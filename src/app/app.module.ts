@@ -1,5 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { StoreModule } from '@ngrx/store';
+import { appReducer } from './app.component.rx';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { AppComponent } from './app.component';
@@ -28,7 +30,8 @@ import { SignUpComponent } from './auth/sign-up/sign-up.component';
   ],
   imports: [
     BrowserModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
+    StoreModule.forRoot({ reducers: appReducer })
   ],
   providers: [],
   bootstrap: [AppComponent]
