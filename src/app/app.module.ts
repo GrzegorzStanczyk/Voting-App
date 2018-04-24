@@ -13,6 +13,7 @@ import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { environment } from '../environments/environment';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NavigationComponent } from './navigation/navigation.component';
+import { AppRoutingModule } from './/app-routing.module';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { NavigationComponent } from './navigation/navigation.component';
     BrowserModule,
     VoteModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
-    StoreModule.forRoot({ reducers: appReducer })
+    StoreModule.forRoot({ reducers: appReducer }),
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
