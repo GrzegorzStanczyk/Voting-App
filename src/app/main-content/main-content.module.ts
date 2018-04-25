@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { VoteComponent } from './vote.component';
+import { VoteComponent } from './vote/vote.component';
 import { PollComponent } from './poll/poll.component';
 import { FeedbackComponent } from './feedback/feedback.component';
 import { ResultComponent } from './result/result.component';
 import { UserPollsComponent } from './user-polls/user-polls.component';
+import { MainContentRoutingModule } from './main-content-routing.module';
 
 @NgModule({
   declarations: [
@@ -16,14 +17,8 @@ import { UserPollsComponent } from './user-polls/user-polls.component';
     UserPollsComponent
   ],
   imports: [
-    CommonModule
-  ],
-  exports: [
-    VoteComponent,
-    PollComponent,
-    FeedbackComponent,
-    ResultComponent,
-    UserPollsComponent
+    CommonModule,
+    MainContentRoutingModule
   ]
 })
-export class VoteModule { }
+export class MainContentModule { }
