@@ -1,12 +1,55 @@
 import { Action } from '@ngrx/store';
 import { Store, select } from '@ngrx/store';
 
+interface Field {
+  name: string;
+  votes: number;
+}
+interface Poll {
+  title: string;
+  fields: Field[];
+}
+
 interface AppState  {
-  id: number;
+  userPolls: Poll[];
+  poll: Poll;
 }
 
 const initialState: AppState  = {
-  id: 1
+  userPolls: [
+    {
+      title: 'Who is your hero?',
+      fields: [
+        { name: 'Batman', votes: 20 },
+        { name: 'Superman', votes: 40 },
+        { name: 'Captain America', votes: 20 }
+      ]
+    },
+    {
+      title: 'Who is your hero?',
+      fields: [
+        { name: 'Batman', votes: 20 },
+        { name: 'Superman', votes: 40 },
+        { name: 'Captain America', votes: 20 }
+      ]
+    },
+    {
+      title: 'Who is your hero?',
+      fields: [
+        { name: 'Batman', votes: 20 },
+        { name: 'Superman', votes: 40 },
+        { name: 'Captain America', votes: 20 }
+      ]
+    }
+  ],
+  poll: {
+    title: 'Who is your hero?',
+    fields: [
+      { name: 'Batman', votes: 20 },
+      { name: 'Superman', votes: 40 },
+      { name: 'Captain America', votes: 20 }
+    ]
+  }
 };
 
 const ACTION = 'ACTION';

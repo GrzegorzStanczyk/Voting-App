@@ -4,6 +4,7 @@ import { StoreModule } from '@ngrx/store';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { MainContentModule } from './main-content/main-content.module';
 import { AppRoutingModule } from './/app-routing.module';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { environment } from '../environments/environment';
 import { appReducer } from './app.component.rx';
@@ -29,6 +30,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     BrowserModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     StoreModule.forRoot({ reducers: appReducer }),
+    StoreDevtoolsModule.instrument(),
     AppRoutingModule,
     MainContentModule
   ],
