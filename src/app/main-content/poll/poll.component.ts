@@ -21,18 +21,12 @@ export class PollComponent implements OnInit {
    }
 
   ngOnInit() {
-    this.poll$.subscribe(v => {
-      console.log(v);
-    });
-
     this.pollForm = new FormGroup({
       poll: new FormControl()
     });
   }
 
   onSubmit() {
-    console.log(this.pollForm.get('poll'));
     this.store.dispatch(new UserVoteAction(this.pollForm.get('poll').value));
   }
-
 }
