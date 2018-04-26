@@ -9,7 +9,7 @@
         <input type="radio" formControlName="poll" [id]="i" [value]="field.name" class="custom-control-input">
         <label class="custom-control-label" [for]="i">{{field.name}}</label>
       </div>
-      <button type="submit"class="btn btn-primary">Submit</button>
+      <button [disabled]="!!pollForm.invalid" type="submit"class="btn btn-primary">Submit</button>
     </form>
   </div>
   <div class="card-footer text-muted">

@@ -9,6 +9,7 @@
   cursor: pointer;
   margin: 10px 0;
   .custom-control-label{
+    display: block;
     cursor: inherit;
     padding: 10px 5px;
     &::before, &::after {
