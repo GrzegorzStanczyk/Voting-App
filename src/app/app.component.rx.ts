@@ -1,24 +1,33 @@
 import { Action } from '@ngrx/store';
 import { Store, select } from '@ngrx/store';
 
-interface Field {
+export interface Field {
   name: string;
   votes: number;
 }
-interface Poll {
+export interface Poll {
   title: string;
+  author: string;
   fields: Field[];
 }
-
-interface AppState  {
+export interface User {
+  name: string;
+}
+export interface VoteApp  {
+  user: User;
   userPolls: Poll[];
   poll: Poll;
 }
+export interface AppState  {
+  voteApp: VoteApp;
+}
 
-const initialState: AppState  = {
+const initialState: VoteApp  = {
+  user: {name: 'Oskar'},
   userPolls: [
     {
       title: 'Who is your hero?',
+      author: 'Janek',
       fields: [
         { name: 'Batman', votes: 20 },
         { name: 'Superman', votes: 40 },
@@ -27,6 +36,7 @@ const initialState: AppState  = {
     },
     {
       title: 'Who is your hero?',
+      author: 'Janek',
       fields: [
         { name: 'Batman', votes: 20 },
         { name: 'Superman', votes: 40 },
@@ -35,6 +45,7 @@ const initialState: AppState  = {
     },
     {
       title: 'Who is your hero?',
+      author: 'Janek',
       fields: [
         { name: 'Batman', votes: 20 },
         { name: 'Superman', votes: 40 },
@@ -44,6 +55,7 @@ const initialState: AppState  = {
   ],
   poll: {
     title: 'Who is your hero?',
+    author: 'Janek',
     fields: [
       { name: 'Batman', votes: 20 },
       { name: 'Superman', votes: 40 },
@@ -60,10 +72,12 @@ class FirstAction implements Action {
 
 export type AppActions = FirstAction;
 
-export function appReducer(state: AppState  = initialState, action: AppActions) {
+export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
     case ACTION :
-    state = state;
+    return state = state;
+
+    default:
     return state;
   }
 }

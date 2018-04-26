@@ -1,4 +1,10 @@
+import { VoteApp } from './../../app.component.rx';
 import { Component, OnInit } from '@angular/core';
+
+import { Store, select, State } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
+import { Poll, AppState } from '../../app.component.rx';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-poll',
@@ -6,10 +12,16 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./poll.component.scss']
 })
 export class PollComponent implements OnInit {
+  poll$: Observable<Poll>;
 
-  constructor() { }
+  constructor(private store: Store<AppState>) {
+    this.poll$ = store.pipe(select(state => state.voteApp.poll), filter(v => !!v));
+   }
 
   ngOnInit() {
+    this.poll$.subscribe(v => {
+      console.log(v);
+    });
   }
 
 }

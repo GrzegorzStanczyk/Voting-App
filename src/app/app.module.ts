@@ -29,7 +29,7 @@ import { NavigationComponent } from './navigation/navigation.component';
   imports: [
     BrowserModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
-    StoreModule.forRoot({ reducers: appReducer }),
+    StoreModule.forRoot({ voteApp:  appReducer }),
     StoreDevtoolsModule.instrument(),
     AppRoutingModule,
     MainContentModule

@@ -1,11 +1,21 @@
-<div class="card text-center">
+<div class="card text-center" *ngIf="(poll$ | async) as poll; else loading">
   <div class="card-header">
-      Who is your favorite captain?
+      {{poll.title}}
   </div>
   <div class="card-body">
-    <p>by Author</p>
+    <p>{{poll.author}}</p>
     <form>
-      <div class="input-group options">
+
+      <div class="input-group options" *ngFor="let field of poll.fields">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+          <input type="radio" aria-label="Radio button for following text input">
+          </div>
+        </div>
+        <input type="text" class="form-control" [attr.aria-label]="field.name" readonly>
+      </div>
+
+      <!-- <div class="input-group options">
         <div class="input-group-prepend">
           <div class="input-group-text">
           <input type="radio" aria-label="Radio button for following text input">
@@ -28,7 +38,7 @@
           </div>
         </div>
         <input type="text" class="form-control" aria-label="Text input with radio button" readonly>
-      </div>
+      </div> -->
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
@@ -36,3 +46,7 @@
     Number of options: XXX
   </div>
 </div>
+
+<ng-template #loading>
+  Loading stuff...
+</ng-template>
