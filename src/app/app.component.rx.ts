@@ -64,22 +64,22 @@ const initialState: VoteApp  = {
   }
 };
 
-const ACTION = 'ACTION';
+const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
 
-class FirstAction implements Action {
-  readonly type = ACTION;
+export class UserVoteAction implements Action {
+  readonly type = USER_VOTE_ACTION;
+
+  constructor(public payload: string) {}
 }
 
-export type AppActions = FirstAction;
+export type AppActions =
+  | UserVoteAction;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
-    case ACTION :
-    return state = state;
-
-    default:
-    return state;
+    case USER_VOTE_ACTION :
+      const vote = state.poll.fields.map(v => v.name === action.payload ? {name: v.name, votes: ++v.votes} : v);
+      state = {...state, poll: {...state.poll, fields: vote}};
   }
+  return state;
 }
-
-

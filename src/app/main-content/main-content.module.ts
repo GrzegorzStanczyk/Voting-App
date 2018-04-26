@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { VoteComponent } from './vote/vote.component';
 import { PollComponent } from './poll/poll.component';
@@ -18,7 +19,9 @@ import { MainContentRoutingModule } from './main-content-routing.module';
   ],
   imports: [
     CommonModule,
-    MainContentRoutingModule
+    MainContentRoutingModule,
+    ReactiveFormsModule,
+    FormsModule
   ]
 })
 export class MainContentModule { }

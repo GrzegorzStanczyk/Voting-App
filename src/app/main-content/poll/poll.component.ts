@@ -1,5 +1,6 @@
-import { VoteApp } from './../../app.component.rx';
+import { VoteApp, UserVoteAction } from './../../app.component.rx';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 
 import { Store, select, State } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -13,15 +14,25 @@ import { filter } from 'rxjs/operators';
 })
 export class PollComponent implements OnInit {
   poll$: Observable<Poll>;
+  pollForm: FormGroup;
 
-  constructor(private store: Store<AppState>) {
-    this.poll$ = store.pipe(select(state => state.voteApp.poll), filter(v => !!v));
+  constructor(private fb: FormBuilder, private store: Store<AppState>) {
+    this.poll$ = store.pipe(select(state => state.voteApp.poll));
    }
 
   ngOnInit() {
     this.poll$.subscribe(v => {
       console.log(v);
     });
+
+    this.pollForm = new FormGroup({
+      poll: new FormControl()
+    });
+  }
+
+  onSubmit() {
+    console.log(this.pollForm.get('poll'));
+    this.store.dispatch(new UserVoteAction(this.pollForm.get('poll').value));
   }
 
 }

@@ -3,7 +3,18 @@
   justify-content: center;
   align-items: center;
 }
-
-.options {
+.custom-control {
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+  cursor: pointer;
   margin: 10px 0;
+  .custom-control-label{
+    cursor: inherit;
+    padding: 10px 5px;
+    &::before, &::after {
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
 }
