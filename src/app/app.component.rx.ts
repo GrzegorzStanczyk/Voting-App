@@ -9,6 +9,7 @@ export interface Poll {
   title: string;
   author: string;
   fields: Field[];
+  sum: number;
 }
 export interface User {
   name: string;
@@ -32,7 +33,8 @@ const initialState: VoteApp  = {
         { name: 'Batman', votes: 20 },
         { name: 'Superman', votes: 40 },
         { name: 'Captain America', votes: 20 }
-      ]
+      ],
+      sum: 80
     },
     {
       title: 'Who is your hero?',
@@ -41,7 +43,8 @@ const initialState: VoteApp  = {
         { name: 'Batman', votes: 20 },
         { name: 'Superman', votes: 40 },
         { name: 'Captain America', votes: 20 }
-      ]
+      ],
+      sum: 80
     },
     {
       title: 'Who is your hero?',
@@ -50,17 +53,19 @@ const initialState: VoteApp  = {
         { name: 'Batman', votes: 20 },
         { name: 'Superman', votes: 40 },
         { name: 'Captain America', votes: 20 }
-      ]
+      ],
+      sum: 80
     }
   ],
   poll: {
     title: 'Who is your hero?',
     author: 'Janek',
     fields: [
-      { name: 'Batman', votes: 20 },
-      { name: 'Superman', votes: 40 },
-      { name: 'Captain America', votes: 20 }
-    ]
+      { name: 'Batman', votes: 90 },
+      { name: 'Superman', votes: 45 },
+      { name: 'Captain America', votes: 5 }
+    ],
+    sum: 140
   }
 };
 
@@ -79,7 +84,8 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
     case USER_VOTE_ACTION :
       const vote = state.poll.fields.map(v => v.name === action.payload ? {name: v.name, votes: ++v.votes} : v);
-      state = {...state, poll: {...state.poll, fields: vote}};
+      const sum = vote.reduce((a,b) => a + b.votes, 0);
+      state = {...state, poll: {...state.poll, fields: vote, sum}};
   }
   return state;
 }

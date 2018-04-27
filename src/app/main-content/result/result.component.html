@@ -1,20 +1,24 @@
-firest
-<div class="progress">
-  <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+<div *ngIf="(result$ | async) as result; else loading">
+  <h3>{{result.title}}</h3>
+  <div class="poll-option" *ngFor="let field of result.fields">
+    <h5>{{field.name}}</h5>
+    <div class="progress">
+      <div 
+        #progressBar
+        class="progress-bar" 
+        role="progressbar" 
+        [style.width.%]="field.votes / result.sum * 100"
+        [attr.aria-valuenow]="field.votes / result.sum * 100" 
+        aria-valuemin="0" 
+        aria-valuemax="100">
+        {{field.votes}} / {{(field.votes / result.sum) | percent}}
+      </div>
+    </div>
+  </div>
+  <b>Votes sum: {{result.sum}}</b>
+  <p>Poll author: {{result.author}}</p>
 </div>
-second
-<div class="progress">
-  <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-third
-<div class="progress">
-  <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-fourth
-<div class="progress">
-  <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-fifth
-<div class="progress">
-  <div class="progress-bar" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
+
+<ng-template #loading>
+  Loading stuff...
+</ng-template>

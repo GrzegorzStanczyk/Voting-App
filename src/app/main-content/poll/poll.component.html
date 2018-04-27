@@ -3,7 +3,7 @@
     {{poll.title}}
   </div>
   <div class="card-body">
-    <p>{{poll.author}}</p>
+    <p>Poll author: {{poll.author}}</p>
     <form [formGroup]="pollForm" (ngSubmit)="onSubmit()">
       <div class="custom-control custom-radio" *ngFor="let field of poll.fields; index as i">
         <input type="radio" formControlName="poll" [id]="i" [value]="field.name" class="custom-control-input">
