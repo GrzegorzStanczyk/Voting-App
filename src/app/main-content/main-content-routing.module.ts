@@ -8,7 +8,7 @@ import { UserPollsComponent } from './user-polls/user-polls.component';
 import { VoteComponent } from './vote/vote.component';
 
 export const mainRoutes: Routes = [
-  { path: 'vote', component: VoteComponent },
+  { path: 'new-poll', component: VoteComponent },
   { path: 'feedback', component: FeedbackComponent },
   { path: 'poll', component: PollComponent },
   { path: 'result', component: ResultComponent },
