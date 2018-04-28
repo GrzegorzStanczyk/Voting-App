@@ -7,7 +7,7 @@
         #progressBar
         class="progress-bar" 
         role="progressbar" 
-        [style.width.%]="field.votes / result.sum * 100"
+        [style.width.%]="delayFlag ? field.votes / result.sum * 100 : 0"
         [attr.aria-valuenow]="field.votes / result.sum * 100" 
         aria-valuemin="0" 
         aria-valuemax="100">
