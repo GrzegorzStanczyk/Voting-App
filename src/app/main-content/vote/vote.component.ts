@@ -1,4 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
+import { Store, select } from '@ngrx/store';
+import { AppState, UserAddNewPoll, Poll } from 'app/app.component.rx';
+import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vote',
@@ -6,10 +12,48 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./vote.component.scss']
 })
 export class VoteComponent implements OnInit {
+  form: FormGroup;
+  items: any = [];
+  authorName$: Observable<string>;
+  authorName: string;
 
-  constructor() { }
+  constructor(
+    private store: Store<AppState>,
+    private fb: FormBuilder,
+    private router: Router) {
+    this.authorName$ = this.store.pipe(select(state => state.voteApp.user.name));
+   }
 
   ngOnInit() {
+    this.form = this.fb.group({
+      title: ['', Validators.required],
+      items: this.fb.array([ this.createItem(), this.createItem() ])
+    });
+    this.items = this.form.get('items') as FormArray;
+    this.authorName$.pipe(take(1)).subscribe(n => this.authorName = n);
+  }
+
+  onSubmit() {
+    if (this.form.invalid) {
+      return;
+    }
+    const { title, items } = this.form.value;
+    const newPoll: Poll = {
+      title,
+      author: this.authorName,
+      sum: 0,
+      fields: items.map(i => ({name: i, votes: 0}))
+    };
+    this.store.dispatch(new UserAddNewPoll(newPoll));
+    this.router.navigate(['/result']);
+  }
+
+  createItem(): FormControl {
+    return new FormControl('', Validators.required);
+  }
+
+  addItem() {
+    this.items.push(this.createItem());
   }
 
 }

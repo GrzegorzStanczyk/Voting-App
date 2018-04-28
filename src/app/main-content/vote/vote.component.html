@@ -3,21 +3,29 @@
     New Poll
   </div>
   <div class="card-body">
-    <form>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label class="card-title" for="exampleInputEmail1">Name your poll</label>
-        <input type="text" class="form-control" placeholder="What is your favorite brand?">
+        <input 
+          formControlName="title"
+          type="text" 
+          class="form-control" 
+          placeholder="Poll title">
       </div>
-      <div class="form-group options">
+      <div formArrayName="items" class="form-group options">
         <label for="last">Options</label>
-        <input type="text" class="form-control" placeholder="Coke">
-        <input type="text" class="form-control" placeholder="Coke">
-        <input id="last" type="text" class="form-control" placeholder="Coke">
+        <input 
+          *ngFor="let itemControl of form.get('items').controls; index as i; last as last"
+          [id]="last ? 'last' : ''"
+          type="text" class="form-control" 
+          [formControlName]="i" 
+          placeholder="Poll item">
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button (click)="addItem()" type="button" class="btn btn-light">Add item</button>
+      <button [disabled]="!!form.invalid" type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
   <div class="card-footer text-muted">
-    Number of options: XXX
+    Number of options: {{items.length}}
   </div>
 </div>

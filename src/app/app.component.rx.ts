@@ -71,6 +71,7 @@ const initialState: VoteApp  = {
 
 const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
 const USER_DELETE_POLL = 'USER_DELETE_POLL';
+const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -84,9 +85,16 @@ export class UserDeletePollAction implements Action {
   constructor(public payload: number) {}
 }
 
+export class UserAddNewPoll implements Action {
+  readonly type = USER_ADD_NEW_POLL;
+
+  constructor(public payload: Poll) {}
+}
+
 export type AppActions =
   | UserVoteAction
-  | UserDeletePollAction;
+  | UserDeletePollAction
+  | UserAddNewPoll;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -96,8 +104,13 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       state = {...state, poll: {...state.poll, fields: vote, sum}};
       break;
     case USER_DELETE_POLL :
-      state.userPolls.splice(action.payload, 1)
+      state.userPolls.splice(action.payload, 1);
       state = {...state};
+      break;
+    case USER_ADD_NEW_POLL :
+      state.userPolls.push(action.payload);
+      state = {...state};
+      break;
   }
   return state;
 }
