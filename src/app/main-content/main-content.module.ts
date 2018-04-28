@@ -7,6 +7,7 @@ import { PollComponent } from './poll/poll.component';
 import { FeedbackComponent } from './feedback/feedback.component';
 import { ResultComponent } from './result/result.component';
 import { UserPollsComponent } from './user-polls/user-polls.component';
+import { PollResultComponent } from './result/poll-result/poll-result.component';
 import { MainContentRoutingModule } from './main-content-routing.module';
 
 @NgModule({
@@ -15,7 +16,8 @@ import { MainContentRoutingModule } from './main-content-routing.module';
     PollComponent,
     FeedbackComponent,
     ResultComponent,
-    UserPollsComponent
+    UserPollsComponent,
+    PollResultComponent
   ],
   imports: [
     CommonModule,

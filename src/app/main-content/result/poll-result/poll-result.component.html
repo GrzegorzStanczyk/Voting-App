@@ -1,0 +1,24 @@
+<div *ngIf="result; else loading">
+  <h3>{{result.title}}</h3>
+  <div class="poll-option" *ngFor="let field of result.fields">
+    <h5>{{field.name}}</h5>
+    <div class="progress">
+      <div 
+        #progressBar
+        class="progress-bar" 
+        role="progressbar" 
+        [style.width.%]="delayFlag ? field.votes / result.sum * 100 : 0"
+        [attr.aria-valuenow]="field.votes / result.sum * 100" 
+        aria-valuemin="0" 
+        aria-valuemax="100">
+        {{field.votes}} / {{(field.votes / result.sum) | percent}}
+      </div>
+    </div>
+  </div>
+  <b>Votes sum: {{result.sum}}</b>
+  <p>Poll author: {{result.author}}</p>
+</div>
+
+<ng-template #loading>
+  Loading stuff...
+</ng-template>

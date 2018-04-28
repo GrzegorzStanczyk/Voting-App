@@ -40,21 +40,21 @@ const initialState: VoteApp  = {
       title: 'Who is your hero?',
       author: 'Janek',
       fields: [
-        { name: 'Batman', votes: 20 },
-        { name: 'Superman', votes: 40 },
-        { name: 'Captain America', votes: 20 }
+        { name: 'CatWoman', votes: 100 },
+        { name: 'Barbie', votes: 10 },
+        { name: 'SuperGirl', votes: 20 }
       ],
-      sum: 80
+      sum: 130
     },
     {
       title: 'Who is your hero?',
       author: 'Janek',
       fields: [
-        { name: 'Batman', votes: 20 },
-        { name: 'Superman', votes: 40 },
-        { name: 'Captain America', votes: 20 }
+        { name: 'Hulk', votes: 50 },
+        { name: 'IronMan', votes: 40 },
+        { name: 'Thor', votes: 60 }
       ],
-      sum: 80
+      sum: 140
     }
   ],
   poll: {
@@ -70,6 +70,7 @@ const initialState: VoteApp  = {
 };
 
 const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
+const USER_DELETE_POLL = 'USER_DELETE_POLL';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -77,8 +78,15 @@ export class UserVoteAction implements Action {
   constructor(public payload: string) {}
 }
 
+export class UserDeletePollAction implements Action {
+  readonly type = USER_DELETE_POLL;
+
+  constructor(public payload: number) {}
+}
+
 export type AppActions =
-  | UserVoteAction;
+  | UserVoteAction
+  | UserDeletePollAction;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -86,6 +94,10 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       const vote = state.poll.fields.map(v => v.name === action.payload ? {name: v.name, votes: ++v.votes} : v);
       const sum = vote.reduce((a,b) => a + b.votes, 0);
       state = {...state, poll: {...state.poll, fields: vote, sum}};
+      break;
+    case USER_DELETE_POLL :
+      state.userPolls.splice(action.payload, 1)
+      state = {...state};
   }
   return state;
 }
