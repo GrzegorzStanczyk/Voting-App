@@ -10,7 +10,8 @@
           formControlName="title"
           type="text" 
           class="form-control" 
-          placeholder="Poll title">
+          placeholder="Poll title"
+          autocomplete="off">
       </div>
       <div formArrayName="items" class="form-group options">
         <label for="last">Options</label>
@@ -19,7 +20,8 @@
           [id]="last ? 'last' : ''"
           type="text" class="form-control" 
           [formControlName]="i" 
-          placeholder="Poll item">
+          placeholder="Poll item"
+          autocomplete="off">
       </div>
       <button (click)="addItem()" type="button" class="btn btn-light">Add item</button>
       <button [disabled]="!!form.invalid" type="submit" class="btn btn-primary">Submit</button>
