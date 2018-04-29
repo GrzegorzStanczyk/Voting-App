@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 app.use('/', appRoutes);
 // app.use((req, res) => res.render('index'));
-app.use((req, res) => res.sendFile('index.html'));
+app.use((req, res) => res.sendFile(__dirname, 'index.html'));
 
 // app.get('*', (req, res) => res.sendFile(path.join(__dirname + '/dist/index.html')));
 
