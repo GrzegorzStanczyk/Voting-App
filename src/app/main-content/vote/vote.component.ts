@@ -5,6 +5,8 @@ import { AppState, UserAddNewPoll, Poll } from 'app/app.component.rx';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import * as io from 'socket.io-client';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-vote',
@@ -16,6 +18,7 @@ export class VoteComponent implements OnInit {
   items: any = [];
   authorName$: Observable<string>;
   authorName: string;
+  private socket: any;
 
   constructor(
     private store: Store<AppState>,
@@ -31,6 +34,14 @@ export class VoteComponent implements OnInit {
     });
     this.items = this.form.get('items') as FormArray;
     this.authorName$.pipe(take(1)).subscribe(n => this.authorName = n);
+
+    this.socket = io(environment.URL);
+    this.socket.on('news', data => {
+      console.log(data);
+    });
+    this.socket.on('poll', data => {
+      console.log(data);
+    });
   }
 
   onSubmit() {
@@ -45,7 +56,9 @@ export class VoteComponent implements OnInit {
       fields: items.map(i => ({name: i, votes: 0}))
     };
     this.store.dispatch(new UserAddNewPoll(newPoll));
-    this.router.navigate(['/result']);
+    this.socket.emit('event', { my: 'data'});
+    // this.router.navigate(['/result']);
+
   }
 
   createItem(): FormControl {
