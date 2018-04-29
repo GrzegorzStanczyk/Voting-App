@@ -15,7 +15,7 @@
       <div formArrayName="items" class="form-group options">
         <label for="last">Options</label>
         <input 
-          *ngFor="let itemControl of form.get('items').controls; index as i; last as last"
+          *ngFor="let itemControl of form.get('items')['controls']; index as i; last as last"
           [id]="last ? 'last' : ''"
           type="text" class="form-control" 
           [formControlName]="i" 
