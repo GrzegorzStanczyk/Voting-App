@@ -30,3 +30,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 ## Heroku cli deploy 
 `git push heroku`  
 After heroku cli deploy use `heroku open` to open live app.
+Use `heroku logs --tail` to see server console logs.
