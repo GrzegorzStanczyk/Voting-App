@@ -1,3 +1,4 @@
+import { WebsocketService } from 'app/services/websocket.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
@@ -23,7 +24,8 @@ export class VoteComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private fb: FormBuilder,
-    private router: Router) {
+    private router: Router,
+    private websocketService: WebsocketService) {
     this.authorName$ = this.store.pipe(select(state => state.voteApp.user.name));
    }
 
@@ -48,7 +50,9 @@ export class VoteComponent implements OnInit {
       fields: items.map(i => ({name: i, votes: 0}))
     };
     this.store.dispatch(new UserAddNewPoll(newPoll));
-    this.router.navigate(['/result']);
+    this.websocketService.AddNewPoll();
+    
+    // this.router.navigate(['/result']);
   }
 
   createItem(): FormControl {
