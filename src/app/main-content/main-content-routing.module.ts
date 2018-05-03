@@ -12,7 +12,8 @@ export const mainRoutes: Routes = [
   { path: 'feedback', component: FeedbackComponent },
   { path: 'poll', component: PollComponent },
   { path: 'result', component: ResultComponent },
-  { path: 'user-polls', component: UserPollsComponent }
+  { path: 'user-polls', component: UserPollsComponent },
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({
