@@ -16,6 +16,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { NavigationComponent } from './navigation/navigation.component';
+import { WebsocketService } from './services/websocket.service';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     AppRoutingModule,
     MainContentModule
   ],
-  providers: [],
+  providers: [WebsocketService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

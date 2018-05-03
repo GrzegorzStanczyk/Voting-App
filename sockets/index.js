@@ -11,7 +11,8 @@ exports.init = server => {
     socket.on('event', data => {
       console.log(data);
       // socket.broadcast.emit('poll', { poll: 'poll' });
-      io.sockets.emit('poll', { poll: 'poll' });
+      // io.sockets.emit('poll', { poll: 'poll' });
+      io.emit('poll', { poll: 'poll' });
     });
   })
 }
