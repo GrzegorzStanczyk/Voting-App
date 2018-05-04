@@ -1,3 +1,6 @@
+require('source-map-support').install();
+process.on('unhandledRejection', console.log('PROMISE ERROR'));
+
 const express = require('express');
 const path = require('path');
 const app = express();
