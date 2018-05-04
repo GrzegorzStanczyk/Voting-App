@@ -31,3 +31,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 `git push heroku`  
 After heroku cli deploy use `heroku open` to open live app.
 Use `heroku logs --tail` to see server console logs.
+
+## DevTools
+Server have source map support. To enter debugger type:
+`node --inspect server.js`, and in chrome `about:inspect` or `chrome://inspect`.
