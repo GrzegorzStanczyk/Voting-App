@@ -8,11 +8,11 @@ import { Poll, AppState } from 'app/app.component.rx';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-poll',
-  templateUrl: './poll.component.html',
-  styleUrls: ['./poll.component.scss']
+  selector: 'app-poll-vote',
+  templateUrl: './poll-vote.component.html',
+  styleUrls: ['./poll-vote.component.scss']
 })
-export class PollComponent implements OnInit {
+export class PollVoteComponent implements OnInit {
   poll$: Observable<Poll>;
   pollForm: FormGroup;
 

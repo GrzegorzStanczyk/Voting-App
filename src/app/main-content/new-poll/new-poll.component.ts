@@ -10,11 +10,11 @@ import * as io from 'socket.io-client';
 import { environment } from 'environments/environment';
 
 @Component({
-  selector: 'app-vote',
-  templateUrl: './vote.component.html',
-  styleUrls: ['./vote.component.scss']
+  selector: 'app-new-poll',
+  templateUrl: './new-poll.component.html',
+  styleUrls: ['./new-poll.component.scss']
 })
-export class VoteComponent implements OnInit {
+export class NewPollComponent implements OnInit {
   form: FormGroup;
   items: any = [];
   authorName$: Observable<string>;
