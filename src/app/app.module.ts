@@ -1,13 +1,14 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { MainContentModule } from './main-content/main-content.module';
 import { AppRoutingModule } from './/app-routing.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { environment } from '../environments/environment';
-import { appReducer } from './app.component.rx';
+import { appReducer, PollEffects } from './app.component.rx';
 
 import { AppComponent } from './app.component';
 import { CreditsComponent } from './credits/credits.component';
@@ -16,7 +17,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { NavigationComponent } from './navigation/navigation.component';
-import { WebsocketService } from './services/websocket.service';
 
 @NgModule({
   declarations: [
@@ -31,11 +31,12 @@ import { WebsocketService } from './services/websocket.service';
     BrowserModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     StoreModule.forRoot({ voteApp:  appReducer }),
+    EffectsModule.forRoot([PollEffects]),
     StoreDevtoolsModule.instrument(),
     AppRoutingModule,
     MainContentModule
   ],
-  providers: [WebsocketService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

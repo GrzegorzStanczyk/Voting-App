@@ -1,5 +1,11 @@
+import { Injectable } from '@angular/core';
 import { Action } from '@ngrx/store';
 import { Store, select } from '@ngrx/store';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { switchMap, map, tap } from 'rxjs/operators';
+import { WebsocketService } from './services/websocket.service';
 
 export interface Field {
   name: string;
@@ -72,6 +78,7 @@ const initialState: VoteApp  = {
 const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
 const USER_DELETE_POLL = 'USER_DELETE_POLL';
 const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
+const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -91,10 +98,17 @@ export class UserAddNewPoll implements Action {
   constructor(public payload: Poll) {}
 }
 
+export class NewPollAdded implements Action {
+  readonly type = NEW_POLL_ADDED;
+
+  constructor(public payload: Poll) {}
+}
+
 export type AppActions =
   | UserVoteAction
   | UserDeletePollAction
-  | UserAddNewPoll;
+  | UserAddNewPoll
+  | NewPollAdded;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -107,10 +121,35 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       state.userPolls.splice(action.payload, 1);
       state = {...state};
       break;
-    case USER_ADD_NEW_POLL :
+    case NEW_POLL_ADDED :
       state.userPolls.push(action.payload);
       state = {...state};
       break;
   }
   return state;
+}
+
+@Injectable()
+
+export class PollEffects {
+
+  @Effect({dispatch: false})
+  addPoll$ = this.actions$.pipe(
+    ofType(USER_ADD_NEW_POLL),
+    map((action: UserAddNewPoll) => action.payload),
+    tap((poll: Poll) => this.websocketService.AddNewPoll(poll))
+  );
+
+  @Effect()
+  onPollAdded$: Observable<AppActions> = this.websocketService.newPollAdded$.pipe(
+    switchMap((poll: Poll) => {
+      this.router.navigate(['/result']);
+      return of(new NewPollAdded(poll));
+    })
+  );
+
+  constructor(
+    private actions$: Actions,
+    private websocketService: WebsocketService,
+    private router: Router) {}
 }

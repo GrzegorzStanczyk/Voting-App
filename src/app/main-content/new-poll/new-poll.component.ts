@@ -5,7 +5,6 @@ import { Store, select } from '@ngrx/store';
 import { AppState, UserAddNewPoll, Poll } from 'app/app.component.rx';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import * as io from 'socket.io-client';
 import { environment } from 'environments/environment';
 
@@ -23,9 +22,7 @@ export class NewPollComponent implements OnInit {
 
   constructor(
     private store: Store<AppState>,
-    private fb: FormBuilder,
-    private router: Router,
-    private websocketService: WebsocketService) {
+    private fb: FormBuilder) {
     this.authorName$ = this.store.pipe(select(state => state.voteApp.user.name));
    }
 
@@ -50,9 +47,6 @@ export class NewPollComponent implements OnInit {
       fields: items.map(i => ({name: i, votes: 0}))
     };
     this.store.dispatch(new UserAddNewPoll(newPoll));
-    this.websocketService.AddNewPoll();
-    
-    // this.router.navigate(['/result']);
   }
 
   createItem(): FormControl {
