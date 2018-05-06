@@ -1,10 +1,10 @@
-import { VoteApp, UserVoteAction } from './../../app.component.rx';
+import { VoteApp, UserVoteAction } from 'app/app.component.rx';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { Store, select } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Poll, AppState } from '../../app.component.rx';
+import { Observable } from 'rxjs';
+import { Poll, AppState } from 'app/app.component.rx';
 import { filter } from 'rxjs/operators';
 
 @Component({
