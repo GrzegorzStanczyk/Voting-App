@@ -16,6 +16,7 @@ export interface Poll {
   author: string;
   fields: Field[];
   sum: number;
+  error?: string;
 }
 export interface User {
   name: string;
@@ -83,6 +84,7 @@ const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
 const USER_DELETE_POLL = 'USER_DELETE_POLL';
 const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
 const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
+const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -114,12 +116,19 @@ export class AppPending implements Action {
   constructor(public payload: boolean) {}
 }
 
+export class PollAddingError implements Action {
+  readonly type = POLL_ADDING_ERROR;
+
+  constructor(public payload: string) {}
+}
+
 export type AppActions =
   | UserVoteAction
   | UserDeletePollAction
   | UserAddNewPoll
   | NewPollAdded
-  | AppPending;
+  | AppPending
+  | PollAddingError;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
