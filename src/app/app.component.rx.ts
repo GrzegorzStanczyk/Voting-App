@@ -24,6 +24,7 @@ export interface VoteApp  {
   user: User;
   userPolls: Poll[];
   poll: Poll;
+  pending: boolean;
 }
 export interface AppState  {
   voteApp: VoteApp;
@@ -72,8 +73,11 @@ const initialState: VoteApp  = {
       { name: 'Captain America', votes: 5 }
     ],
     sum: 140
-  }
+  },
+  pending: false
 };
+
+const APP_PENDING = 'APP_PENDING';
 
 const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
 const USER_DELETE_POLL = 'USER_DELETE_POLL';
@@ -104,11 +108,18 @@ export class NewPollAdded implements Action {
   constructor(public payload: Poll) {}
 }
 
+export class AppPending implements Action {
+  readonly type = APP_PENDING;
+
+  constructor(public payload: boolean) {}
+}
+
 export type AppActions =
   | UserVoteAction
   | UserDeletePollAction
   | UserAddNewPoll
-  | NewPollAdded;
+  | NewPollAdded
+  | AppPending;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -125,6 +136,12 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       state.userPolls.push(action.payload);
       state = {...state};
       break;
+    case APP_PENDING :
+      state = {...state, pending: action.payload};
+      break;
+    case USER_ADD_NEW_POLL :
+      state = {...state};
+      break;
   }
   return state;
 }
@@ -133,19 +150,21 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
 
 export class PollEffects {
 
-  @Effect({dispatch: false})
-  addPoll$ = this.actions$.pipe(
+  @Effect()
+  addPoll$: Observable<AppPending> = this.actions$.pipe(
     ofType(USER_ADD_NEW_POLL),
     map((action: UserAddNewPoll) => action.payload),
-    tap((poll: Poll) => this.websocketService.AddNewPoll(poll))
+    tap((poll: Poll) => this.websocketService.AddNewPoll(poll)),
+    map(() => new AppPending(true))
   );
 
   @Effect()
   onPollAdded$: Observable<AppActions> = this.websocketService.newPollAdded$.pipe(
-    switchMap((poll: Poll) => {
-      this.router.navigate(['/result']);
-      return of(new NewPollAdded(poll));
-    })
+    switchMap((poll: Poll) => [
+      new NewPollAdded(poll),
+      new AppPending(false)
+    ]),
+    tap(res => this.router.navigate(['/result']))
   );
 
   constructor(

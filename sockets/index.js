@@ -13,7 +13,7 @@ exports.init = server => {
       console.log(data);
       // socket.broadcast.emit('poll', { poll: 'poll' });
       // io.sockets.emit('poll', { poll: 'poll' });
-      io.emit('new-poll-added', data);
+      setTimeout(() => io.emit('new-poll-added', data), 1000);
     });
   })
 }

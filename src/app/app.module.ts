@@ -17,6 +17,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { NavigationComponent } from './navigation/navigation.component';
+import { SpinnerComponent } from './spinner/spinner.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { NavigationComponent } from './navigation/navigation.component';
     CreditsComponent,
     SignUpComponent,
     NavigationComponent,
-    DashboardComponent
+    DashboardComponent,
+    SpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -36,6 +38,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     AppRoutingModule,
     MainContentModule
   ],
+  entryComponents: [SpinnerComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

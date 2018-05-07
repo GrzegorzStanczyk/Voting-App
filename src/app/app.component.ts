@@ -1,4 +1,11 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  ComponentFactoryResolver,
+  ViewContainerRef,
+  ComponentFactory} from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { AppState } from './app.component.rx';
+import { SpinnerComponent } from './spinner/spinner.component';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +13,21 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'app';
+  factory: ComponentFactory<SpinnerComponent>;
+
+  constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private viewContainerRef: ViewContainerRef,
+    private store: Store<AppState>) {
+      this.factory = this.componentFactoryResolver.resolveComponentFactory(SpinnerComponent);
+
+      store.pipe(select(state => state.voteApp.pending))
+      .subscribe(pending => {
+        if (pending) {
+          this.viewContainerRef.createComponent(this.factory);
+        } else {
+          this.viewContainerRef.clear();
+        }
+      });
+    }
 }
