@@ -7,10 +7,13 @@ const bodyParser = require('body-parser');
 const server = require('http').Server(app);
 const initializeDatabases = require('./dbs');
 
-const io = require('./sockets').init(server);
+const io = require('./sockets');
 const appRoutes = require('./routes');
 
 const port = process.env.PORT;
+
+// Initialize only one connection to database.
+initializeDatabases().then(dbs => io.init(server, dbs));
 
 // Serve only the static files form the dist directory
 app.use(express.static(__dirname + '/dist'));
