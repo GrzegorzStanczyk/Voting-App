@@ -85,6 +85,7 @@ const USER_DELETE_POLL = 'USER_DELETE_POLL';
 const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
 const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
 const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
+const USER_SIGN_UP = 'USER_SIGN_UP';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -122,13 +123,18 @@ export class PollAddingError implements Action {
   constructor(public payload: string) {}
 }
 
+export class UserSingUp implements Action {
+  readonly type = USER_SIGN_UP;
+}
+
 export type AppActions =
   | UserVoteAction
   | UserDeletePollAction
   | UserAddNewPoll
   | NewPollAdded
   | AppPending
-  | PollAddingError;
+  | PollAddingError
+  | UserSingUp;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -174,6 +180,19 @@ export class PollEffects {
       new AppPending(false)
     ]),
     tap(res => this.router.navigate(['/result']))
+  );
+
+  @Effect()
+  signUp$ = this.actions$.pipe(
+    ofType(USER_SIGN_UP),
+    tap(() => this.websocketService.AddNewUser({ name: 'Mark' })),
+    map(() => new AppPending(true))
+  );
+
+  @Effect()
+  addedNewUser$: Observable<AppActions> = this.websocketService.newUserAdded$.pipe(
+    map(() => new AppPending(false)),
+    tap(res => this.router.navigate(['/']))
   );
 
   constructor(

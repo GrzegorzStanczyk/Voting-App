@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { AppState, UserSingUp } from '../app.component.rx';
 
 @Component({
   selector: 'app-auth',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AuthComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private store: Store<AppState>) { }
 
   ngOnInit() {
+  }
+
+  signUp() {
+    this.store.dispatch(new UserSingUp());
   }
 
 }

@@ -2,7 +2,7 @@ const sio = require('socket.io');
 
 let io = null;
 
-const auth = 'Jamie';
+const auth = '';
 
 exports.io = () => io;
 
@@ -12,7 +12,8 @@ exports.init = (server, dbs) => {
   io.on('connection', socket => {
 
       console.log('SOCKET CONNECTED');
-      socket.emit('news', { hello: 'world'});
+      socket.emit('connected', { hello: 'world'});
+
       socket.on('add-new-poll', data => {
         data.author = auth;
         dbs.collection('polls').insert(data)
@@ -29,6 +30,19 @@ exports.init = (server, dbs) => {
         })
         // socket.broadcast.emit('poll', { poll: 'poll' });
         // io.sockets.emit('poll', { poll: 'poll' });
+      });
+    
+      socket.on('add-new-user', data => {
+        dbs.collection('users').insert(data)
+        .catch(err => {
+          console.log('DBS ADD NEW USER ERROR: ', err);
+          io.emit('new-user-added', {
+            error: 'Database add user error'
+          });
+        })
+        .then(res => {
+          setTimeout(() => io.emit('new-user-added', res), 1000);
+        })
       });
   })
 }
