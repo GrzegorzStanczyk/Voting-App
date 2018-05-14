@@ -1,8 +1,10 @@
 const sio = require('socket.io');
+const ObjectId = require('mongodb').ObjectID;
 
 let io = null;
 
-const auth = '';
+const auth = 'Grzegorz';
+const _id = '5af9f1ea790b260380da5e0e'
 
 exports.io = () => io;
 
@@ -16,6 +18,7 @@ exports.init = (server, dbs) => {
 
       socket.on('add-new-poll', data => {
         data.author = auth;
+        data.user_id = ObjectId(_id);
         dbs.collection('polls').insert(data)
         .catch(err => {
           console.log('DBS INSERT ERROR: ', err);
@@ -24,12 +27,9 @@ exports.init = (server, dbs) => {
           });
         })
         .then(res => {
-          // io.emit('new-poll-added', res);
           setTimeout(() => io.emit('new-poll-added', data), 1000);
-          // dbs.close();
         })
         // socket.broadcast.emit('poll', { poll: 'poll' });
-        // io.sockets.emit('poll', { poll: 'poll' });
       });
     
       socket.on('add-new-user', data => {
@@ -44,8 +44,37 @@ exports.init = (server, dbs) => {
           setTimeout(() => io.emit('new-user-added', res), 1000);
         })
       });
+
+      socket.on('get_user_polls', data => {
+        dbs.collection('users').aggregate([
+          {
+            $lookup: 
+            {
+                from: 'polls',
+                localField: '_id',
+                foreignField: 'user_id',
+                as: 'user_polls'
+            }
+          },
+          { $match: { _id: ObjectId(_id) }}
+        ])
+        .next((err, result) => {
+          if (err) throw err;
+          setTimeout(() => io.emit('user_polls', result), 1000);
+        });
+      })
   })
 }
 
 // For use in consumers
 // const socket = require('../io').io();
+
+// {
+//   $lookup:
+//     {
+//       from: <collection to join>,
+//       localField: <field from the input documents>,
+//       foreignField: <field from the documents of the "from" collection>,
+//       as: <output array field>
+//     }
+// }

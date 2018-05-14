@@ -29,6 +29,9 @@ export class WebsocketService {
     this.socket.on('connected', data => {
       console.log('CONNECTED', data);
     });
+
+    this.socket.on('user_polls', data => console.log('GET USER POLLS', data));
+    this.socket.emit('get_user_polls', null);
   }
 
   AddNewPoll(poll: Poll) {
