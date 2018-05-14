@@ -2,6 +2,8 @@ const sio = require('socket.io');
 
 let io = null;
 
+const auth = 'Jamie';
+
 exports.io = () => io;
 
 exports.init = (server, dbs) => {
@@ -12,6 +14,7 @@ exports.init = (server, dbs) => {
       console.log('SOCKET CONNECTED');
       socket.emit('news', { hello: 'world'});
       socket.on('add-new-poll', data => {
+        data.author = auth;
         dbs.collection('polls').insert(data)
         .catch(err => {
           console.log('DBS INSERT ERROR: ', err);

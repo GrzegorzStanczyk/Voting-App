@@ -16,14 +16,14 @@ import { environment } from 'environments/environment';
 export class NewPollComponent implements OnInit {
   form: FormGroup;
   items: any = [];
-  authorName$: Observable<string>;
-  authorName: string;
+  // authorName$: Observable<string>;
+  // authorName: string;
   private socket: any;
 
   constructor(
     private store: Store<AppState>,
     private fb: FormBuilder) {
-    this.authorName$ = this.store.pipe(select(state => state.voteApp.user.name));
+    // this.authorName$ = this.store.pipe(select(state => state.voteApp.user.name));
    }
 
   ngOnInit() {
@@ -32,7 +32,7 @@ export class NewPollComponent implements OnInit {
       items: this.fb.array([ this.createItem(), this.createItem() ])
     });
     this.items = this.form.get('items') as FormArray;
-    this.authorName$.pipe(take(1)).subscribe(n => this.authorName = n);
+    // this.authorName$.pipe(take(1)).subscribe(n => this.authorName = n);
   }
 
   onSubmit() {
@@ -40,9 +40,8 @@ export class NewPollComponent implements OnInit {
       return;
     }
     const { title, items } = this.form.value;
-    const newPoll: Poll = {
+    const newPoll = {
       title,
-      author: this.authorName,
       sum: 0,
       fields: items.map(i => ({name: i, votes: 0}))
     };
@@ -55,6 +54,14 @@ export class NewPollComponent implements OnInit {
 
   addItem() {
     this.items.push(this.createItem());
+  }
+
+  removeItem(index: number) {
+    this.items.removeAt(index);
+  }
+
+  trackByFn(index: number, item) {
+    return item;
   }
 
 }

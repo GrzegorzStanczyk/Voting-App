@@ -5,7 +5,13 @@
 }
 
 .options {
-  input {
-    margin: 10px 0px;
+  .input {
+    display: flex;
+    input {
+      margin: 10px 0px;
+    }
+    .remove {
+      margin: 10px 0 10px 5px;
+    }
   }
 }

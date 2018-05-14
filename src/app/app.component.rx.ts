@@ -13,7 +13,7 @@ export interface Field {
 }
 export interface Poll {
   title: string;
-  author: string;
+  author?: string;
   fields: Field[];
   sum: number;
   error?: string;

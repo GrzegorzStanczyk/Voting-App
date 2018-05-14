@@ -15,13 +15,18 @@
       </div>
       <div formArrayName="items" class="form-group options">
         <label for="last">Options</label>
-        <input 
-          *ngFor="let itemControl of form.get('items')['controls']; index as i; last as last"
-          [id]="last ? 'last' : ''"
-          type="text" class="form-control" 
-          [formControlName]="i" 
-          placeholder="Poll item"
-          autocomplete="off">
+        <div 
+          class="input" 
+          *ngFor="let itemControl of form.get('items')['controls']; index as i; last as last; trackBy: trackByFn">
+          <input 
+            [id]="last ? 'last' : ''"
+            type="text" class="form-control" 
+            [formControlName]="i" 
+            placeholder="Poll item"
+            autocomplete="off">
+          <button (click)="removeItem(i)" class="remove btn btn-default" type="button">-
+          </button>
+        </div>
       </div>
       <button (click)="addItem()" type="button" class="btn btn-light">Add item</button>
       <button [disabled]="!!form.invalid" type="submit" class="btn btn-primary">Submit</button>
