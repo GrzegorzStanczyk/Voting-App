@@ -68,6 +68,14 @@ exports.init = (server, dbs) => {
           setTimeout(() => io.emit('user_polls', result), 1000);
         });
       })
+
+      socket.on('get-poll', data => {
+        if (ObjectId.isValid(data)) {
+          dbs.collection('polls').findOne({ _id: ObjectId(data) })
+            .catch(err => console.log('GET POLL ERROR', err))
+            .then(poll => io.emit('poll', poll))
+        }
+      })
   })
 }
 

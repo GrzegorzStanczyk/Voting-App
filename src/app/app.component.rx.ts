@@ -17,6 +17,7 @@ export interface Poll {
   fields: Field[];
   sum?: number;
   error?: string;
+  url?: string;
 }
 export interface User {
   name: string;
@@ -86,6 +87,7 @@ const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
 const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
 const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
 const USER_SIGN_UP = 'USER_SIGN_UP';
+const GET_POLL = 'GET_POLL';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -117,14 +119,20 @@ export class AppPending implements Action {
   constructor(public payload: boolean) {}
 }
 
-export class PollAddingError implements Action {
-  readonly type = POLL_ADDING_ERROR;
+// export class PollAddingError implements Action {
+//   readonly type = POLL_ADDING_ERROR;
 
-  constructor(public payload: string) {}
-}
+//   constructor(public payload: string) {}
+// }
 
 export class UserSingUp implements Action {
   readonly type = USER_SIGN_UP;
+}
+
+export class GetPoll implements Action {
+  readonly type = GET_POLL;
+
+  constructor(public payload: Poll) {}
 }
 
 export type AppActions =
@@ -133,8 +141,9 @@ export type AppActions =
   | UserAddNewPoll
   | NewPollAdded
   | AppPending
-  | PollAddingError
-  | UserSingUp;
+  // | PollAddingError
+  | UserSingUp
+  | GetPoll;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -157,6 +166,9 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
     case USER_ADD_NEW_POLL :
       state = {...state};
       break;
+    case GET_POLL :
+      state = {...state, poll: {...action.payload}};
+      break;
   }
   return state;
 }
@@ -173,13 +185,14 @@ export class PollEffects {
     map(() => new AppPending(true))
   );
 
+  @Effect({ dispatch: false})
+  onPollAdded$ = this.websocketService.newPollAdded$.pipe(
+    tap((poll: Poll) => this.router.navigate(['/result'], { queryParams: { poll: poll.url }}))
+  );
+
   @Effect()
-  onPollAdded$: Observable<AppActions> = this.websocketService.newPollAdded$.pipe(
-    switchMap((poll: Poll) => [
-      new NewPollAdded(poll),
-      new AppPending(false)
-    ]),
-    tap(res => this.router.navigate(['/result']))
+  onPollReceived$: Observable<AppActions> = this.websocketService.pollReceived$.pipe(
+    switchMap(poll => [new GetPoll(poll), new AppPending(false)])
   );
 
   @Effect()
