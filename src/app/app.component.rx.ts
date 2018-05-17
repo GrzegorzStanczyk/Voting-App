@@ -9,13 +9,13 @@ import { WebsocketService } from './services/websocket.service';
 
 export interface Field {
   name: string;
-  votes: number;
+  votes?: number;
 }
 export interface Poll {
   title: string;
   author?: string;
   fields: Field[];
-  sum: number;
+  sum?: number;
   error?: string;
 }
 export interface User {

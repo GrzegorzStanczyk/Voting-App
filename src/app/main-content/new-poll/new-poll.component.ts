@@ -42,8 +42,7 @@ export class NewPollComponent implements OnInit {
     const { title, items } = this.form.value;
     const newPoll = {
       title,
-      sum: 0,
-      fields: items.map(i => ({name: i, votes: 0}))
+      fields: items.map(i => ({name: i}))
     };
     this.store.dispatch(new UserAddNewPoll(newPoll));
   }

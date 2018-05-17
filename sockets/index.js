@@ -19,6 +19,8 @@ exports.init = (server, dbs) => {
       socket.on('add-new-poll', data => {
         data.author = auth;
         data.user_id = ObjectId(_id);
+        data.sum = 0;
+        data.fields = data.fields.map(f => ({name: f.name, votes: 0}));
         dbs.collection('polls').insert(data)
         .catch(err => {
           console.log('DBS INSERT ERROR: ', err);
@@ -27,7 +29,10 @@ exports.init = (server, dbs) => {
           });
         })
         .then(res => {
-          setTimeout(() => io.emit('new-poll-added', data), 1000);
+          setTimeout(() => {
+            const {author, sum, fields, title, _id} = res.ops[0];
+            io.emit('new-poll-added', {author, sum, fields, title, url: _id}
+          )}, 1000);
         })
         // socket.broadcast.emit('poll', { poll: 'poll' });
       });
