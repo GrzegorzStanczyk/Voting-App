@@ -1,4 +1,5 @@
 <div *ngIf="result; else loading">
+  <p class="text-center">Poll url: <a href="{{url}}result?poll={{result._id}}">{{url}}result?poll={{result._id}}</a></p>
   <h3>{{result.title}}</h3>
   <div class="poll-option" *ngFor="let field of result.fields">
     <h5>{{field.name}}</h5>

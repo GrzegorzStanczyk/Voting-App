@@ -2,7 +2,7 @@ import { WebsocketService } from 'app/services/websocket.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { AppState, UserAddNewPoll, Poll } from 'app/app.component.rx';
+import { AppState, UserAddNewPollAction, Poll } from 'app/app.component.rx';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import * as io from 'socket.io-client';
@@ -44,7 +44,7 @@ export class NewPollComponent implements OnInit {
       title,
       fields: items.map(i => ({name: i}))
     };
-    this.store.dispatch(new UserAddNewPoll(newPoll));
+    this.store.dispatch(new UserAddNewPollAction(newPoll));
   }
 
   createItem(): FormControl {

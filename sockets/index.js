@@ -11,10 +11,24 @@ exports.io = () => io;
 exports.init = (server, dbs) => {
   io = sio(server);
 
-  io.on('connection', socket => {
+  // var nsp = io.of('/5aff33da1b3b3e2b2cc03aa7');
+  // nsp.on('connection', function(socket){
+  //   console.log('someone connected');
+  //   socket.on('get-poll', data => {
+  //     if (ObjectId.isValid(data)) {
+  //       dbs.collection('polls').findOne({ _id: ObjectId(data) })
+  //         .catch(err => console.log('GET POLL ERROR', err))
+  //         .then(poll => {
+  //           // socket.join(data);
+  //           io.emit('poll', poll)
+  //           // io.to(data).emit('poll', poll)
+  //         })
+  //     }
+  //   })
+  // });
 
+  io.on('connection', socket => {
       console.log('SOCKET CONNECTED');
-      socket.emit('connected', { hello: 'world'});
 
       socket.on('add-new-poll', data => {
         data.author = auth;
@@ -24,15 +38,17 @@ exports.init = (server, dbs) => {
         dbs.collection('polls').insert(data)
         .catch(err => {
           console.log('DBS INSERT ERROR: ', err);
-          io.emit('new-poll-added', {
+          socket.emit('new-poll-added', {
             error: 'Database connection error'
           });
         })
         .then(res => {
           setTimeout(() => {
-            const {author, sum, fields, title, _id} = res.ops[0];
-            io.emit('new-poll-added', {author, sum, fields, title, url: _id}
-          )}, 1000);
+            // const {author, sum, fields, title, _id} = res.ops[0];
+            // socket.emit('new-poll-added', {author, sum, fields, title, url: _id})
+            socket.emit('new-poll-added', res.ops[0]._id);
+            console.log('NEW POLL ADDED');
+          }, 1000);
         })
         // socket.broadcast.emit('poll', { poll: 'poll' });
       });
@@ -41,12 +57,12 @@ exports.init = (server, dbs) => {
         dbs.collection('users').insert(data)
         .catch(err => {
           console.log('DBS ADD NEW USER ERROR: ', err);
-          io.emit('new-user-added', {
+          socket.emit('new-user-added', {
             error: 'Database add user error'
           });
         })
         .then(res => {
-          setTimeout(() => io.emit('new-user-added', res), 1000);
+          setTimeout(() => socket.emit('new-user-added', res), 1000);
         })
       });
 
@@ -65,17 +81,56 @@ exports.init = (server, dbs) => {
         ])
         .next((err, result) => {
           if (err) throw err;
-          setTimeout(() => io.emit('user_polls', result), 1000);
+          setTimeout(() => socket.emit('user_polls', result), 1000);
         });
       })
 
-      socket.on('get-poll', data => {
-        if (ObjectId.isValid(data)) {
-          dbs.collection('polls').findOne({ _id: ObjectId(data) })
+      // socket.on('get-poll', data => {
+      //   if (ObjectId.isValid(data)) {
+      //     dbs.collection('polls').findOne({ _id: ObjectId(data) })
+      //       .catch(err => console.log('GET POLL ERROR', err))
+      //       .then(poll => {
+      //         // socket.join(data);
+      //         // io.to(data).emit('poll', poll)
+      //         // io.emit('poll', poll)
+      //         const nsp = io.of(data);
+      //         nsp.on('connection', () => {
+      //           // socket.emit(data, poll)
+      //           console.log('someone connected');
+      //         })
+      //         io.emit(data, poll)
+      //       })
+      //   }
+      // })
+
+      socket.on('connect to poll', room => {
+        if (ObjectId.isValid(room)) {
+          dbs.collection('polls').findOne({ _id: ObjectId(room) })
             .catch(err => console.log('GET POLL ERROR', err))
-            .then(poll => io.emit('poll', poll))
+            .then(poll => {
+              if (!poll) {
+                console.log('POLL NOT EXIST');
+                return socket.emit('poll not exist', 'Poll not exist in database');
+              }
+              // socket.emit('poll', poll)
+              console.log('JOINED ROOM : ', poll._id);
+              socket.join(room);
+              // io.to(room).emit('poll', poll);
+              // io.to(data).emit('poll', poll)
+              socket.emit('connected to poll', poll)
+              // io.emit('poll', poll)
+              // io.emit(data, poll)
+            })
+        } else {
+          console.log('POLL NOT EXIST');
+          return socket.emit('poll not exist', 'Poll not exist in database');
         }
-      })
+      });
+
+      socket.on('disconnect from poll', room => {
+        console.log('DISCONNECTED FROM ', room);
+        socket.leave(room)
+      });
   })
 }
 

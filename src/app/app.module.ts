@@ -18,6 +18,7 @@ import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { SpinnerComponent } from './spinner/spinner.component';
+import { ModalComponent } from './modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { SpinnerComponent } from './spinner/spinner.component';
     SignUpComponent,
     NavigationComponent,
     DashboardComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +40,7 @@ import { SpinnerComponent } from './spinner/spinner.component';
     AppRoutingModule,
     MainContentModule
   ],
-  entryComponents: [SpinnerComponent],
+  entryComponents: [SpinnerComponent, ModalComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

@@ -27,6 +27,7 @@ export interface VoteApp  {
   userPolls: Poll[];
   poll: Poll;
   pending: boolean;
+  modalMsg: string;
 }
 export interface AppState  {
   voteApp: VoteApp;
@@ -76,7 +77,8 @@ const initialState: VoteApp  = {
     ],
     sum: 140
   },
-  pending: false
+  pending: false,
+  modalMsg: ''
 };
 
 const APP_PENDING = 'APP_PENDING';
@@ -84,10 +86,14 @@ const APP_PENDING = 'APP_PENDING';
 const USER_VOTE_ACTION = 'USER_VOTE_ACTION';
 const USER_DELETE_POLL = 'USER_DELETE_POLL';
 const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
-const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
-const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
+// const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
+// const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
 const USER_SIGN_UP = 'USER_SIGN_UP';
-const GET_POLL = 'GET_POLL';
+const CONNECT_TO_POLL = 'CONNECT_TO_POLL';
+const NO_POLL_IN_DB = 'NO_POLL_IN_DB';
+const DISCONNECT_FORM_POLL = 'DISCONNECT_FORM_POLL';
+const POLL_RECEIVED = 'POLL_RECEIVED';
+const CLOSE_MODAL = 'CLOSE_MODAL';
 
 export class UserVoteAction implements Action {
   readonly type = USER_VOTE_ACTION;
@@ -101,19 +107,19 @@ export class UserDeletePollAction implements Action {
   constructor(public payload: number) {}
 }
 
-export class UserAddNewPoll implements Action {
+export class UserAddNewPollAction implements Action {
   readonly type = USER_ADD_NEW_POLL;
 
   constructor(public payload: Poll) {}
 }
 
-export class NewPollAdded implements Action {
-  readonly type = NEW_POLL_ADDED;
+// export class NewPollAddedAction implements Action {
+//   readonly type = NEW_POLL_ADDED;
 
-  constructor(public payload: Poll) {}
-}
+//   constructor(public payload: Poll) {}
+// }
 
-export class AppPending implements Action {
+export class AppPendingAction implements Action {
   readonly type = APP_PENDING;
 
   constructor(public payload: boolean) {}
@@ -125,25 +131,51 @@ export class AppPending implements Action {
 //   constructor(public payload: string) {}
 // }
 
-export class UserSingUp implements Action {
+export class UserSingUpAction implements Action {
   readonly type = USER_SIGN_UP;
 }
 
-export class GetPoll implements Action {
-  readonly type = GET_POLL;
+export class PollReceivedAction implements Action {
+  readonly type = POLL_RECEIVED;
 
   constructor(public payload: Poll) {}
+}
+
+export class ConnectToPollAction implements Action {
+  readonly type = CONNECT_TO_POLL;
+
+  constructor(public payload: string) {}
+}
+
+export class NoPollInDBAction implements Action {
+  readonly type = NO_POLL_IN_DB;
+
+  constructor(public payload: string) {}
+}
+
+export class DisconnectFromPollAction implements Action {
+  readonly type = DISCONNECT_FORM_POLL;
+
+  constructor(public payload: string) {}
+}
+
+export class CloseModalAction implements Action {
+  readonly type = CLOSE_MODAL;
 }
 
 export type AppActions =
   | UserVoteAction
   | UserDeletePollAction
-  | UserAddNewPoll
-  | NewPollAdded
-  | AppPending
+  | UserAddNewPollAction
+  // | NewPollAddedAction
+  | AppPendingAction
   // | PollAddingError
-  | UserSingUp
-  | GetPoll;
+  | UserSingUpAction
+  | ConnectToPollAction
+  | NoPollInDBAction
+  | DisconnectFromPollAction
+  | PollReceivedAction
+  | CloseModalAction;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -156,19 +188,21 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       state.userPolls.splice(action.payload, 1);
       state = {...state};
       break;
-    case NEW_POLL_ADDED :
-      state.userPolls.push(action.payload);
-      state = {...state};
-      break;
+    // case NEW_POLL_ADDED :
+    //   state.userPolls.push(action.payload);
+    //   state = {...state};
+    //   break;
     case APP_PENDING :
       state = {...state, pending: action.payload};
       break;
-    case USER_ADD_NEW_POLL :
-      state = {...state};
-      break;
-    case GET_POLL :
+    case POLL_RECEIVED :
       state = {...state, poll: {...action.payload}};
       break;
+    case NO_POLL_IN_DB :
+      state = {...state, modalMsg: action.payload};
+      break;
+    case CLOSE_MODAL :
+      state = {...state, modalMsg: ''};
   }
   return state;
 }
@@ -178,33 +212,54 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
 export class PollEffects {
 
   @Effect()
-  addPoll$: Observable<AppPending> = this.actions$.pipe(
+  onAddPoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(USER_ADD_NEW_POLL),
-    map((action: UserAddNewPoll) => action.payload),
+    map((action: UserAddNewPollAction) => action.payload),
     tap((poll: Poll) => this.websocketService.AddNewPoll(poll)),
-    map(() => new AppPending(true))
+    map(() => new AppPendingAction(true))
   );
 
   @Effect({ dispatch: false})
   onPollAdded$ = this.websocketService.newPollAdded$.pipe(
-    tap((poll: Poll) => this.router.navigate(['/result'], { queryParams: { poll: poll.url }}))
+    tap((pollUrl: string) => this.router.navigate(['/result'], { queryParams: { poll: pollUrl }}))
+  );
+
+  @Effect()
+  onConnectToPoll$: Observable<AppActions> = this.actions$.pipe(
+    ofType(CONNECT_TO_POLL),
+    map((action: ConnectToPollAction) => action.payload),
+    tap(pollUrl => this.websocketService.connectToPoll(pollUrl)),
+    map(() => new AppPendingAction(true))
+  );
+
+  @Effect({ dispatch: false })
+  onDisconnectFromPoll$ = this.actions$.pipe(
+    ofType(DISCONNECT_FORM_POLL),
+    map((action: DisconnectFromPollAction) => action.payload),
+    tap(pollUrl => this.websocketService.disconnectFormPoll(pollUrl))
+  );
+
+  @Effect()
+  onNoPollInDBS$: Observable<AppActions> = this.websocketService.noPollInDB$.pipe(
+    tap(msg => console.log(msg)),
+    switchMap(msg => [new AppPendingAction(false), new NoPollInDBAction(msg)])
   );
 
   @Effect()
   onPollReceived$: Observable<AppActions> = this.websocketService.pollReceived$.pipe(
-    switchMap(poll => [new GetPoll(poll), new AppPending(false)])
+    switchMap(poll => [new AppPendingAction(false), new PollReceivedAction(poll)])
   );
 
   @Effect()
-  signUp$ = this.actions$.pipe(
+  onSignUp$ = this.actions$.pipe(
     ofType(USER_SIGN_UP),
     tap(() => this.websocketService.AddNewUser({ name: 'Mark' })),
-    map(() => new AppPending(true))
+    map(() => new AppPendingAction(true))
   );
 
   @Effect()
-  addedNewUser$: Observable<AppActions> = this.websocketService.newUserAdded$.pipe(
-    map(() => new AppPending(false)),
+  onAddedNewUser$: Observable<AppActions> = this.websocketService.newUserAdded$.pipe(
+    map(() => new AppPendingAction(false)),
     tap(res => this.router.navigate(['/']))
   );
 

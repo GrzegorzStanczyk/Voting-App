@@ -10,45 +10,73 @@ import { Observable, Subject } from 'rxjs';
 })
 export class WebsocketService {
   private socket: SocketIOClient.Socket;
-  private newPollAddedSource = new Subject<Poll>();
+  private newPollAddedSource = new Subject<string>();
   private newUserAddedSource = new Subject<User>();
   private pollReceivedSource = new Subject<Poll>();
+  private noPollInDBSource = new Subject<string>();
 
-  newPollAdded$: Observable<Poll> = this.newPollAddedSource.asObservable();
+  newPollAdded$: Observable<string> = this.newPollAddedSource.asObservable();
   newUserAdded$: Observable<User> = this.newUserAddedSource.asObservable();
   pollReceived$: Observable<Poll> = this.pollReceivedSource.asObservable();
+  noPollInDB$: Observable<string> = this.noPollInDBSource.asObservable();
+
+  // namespace = '5aff33da1b3b3e2b2cc03aa7';
+  // namespace = '5b0019ce01a87104fce407b3';
+  // namespace = '5b0019ce01a87104fce407b7';
 
   constructor() {
     this.socket = io(environment.URL);
+
     this.socket.on('new-poll-added', data => {
-      console.log('new-poll-added', data);
+      console.log('NEW POLL ADDED', data);
       this.newPollAddedSource.next(data);
     });
+
     this.socket.on('new-user-added', data => {
       console.log('new-user-added', data);
       this.newUserAddedSource.next(data);
     });
-    this.socket.on('connected', data => {
-      console.log('CONNECTED', data);
+
+    this.socket.on('connected to poll', poll => {
+      console.log('CONNECTED TO POLL: ', poll);
+      // io(`${environment.URL}${poll._id}`);
+      this.pollReceivedSource.next(poll);
     });
-    this.socket.on('poll', poll => this.pollReceivedSource.next(poll));
+
+    this.socket.on('poll not exist', message => {
+      console.log('POLL NOT EXIST', message);
+      this.noPollInDBSource.next(message);
+    });
 
     this.socket.on('user_polls', data => console.log('GET USER POLLS', data));
-    this.socket.emit('get_user_polls', null);
+    this.socket.emit('get_user_polls');
   }
 
   AddNewPoll(poll: Poll) {
-    console.log('Add new poll: ', poll);
+    console.log('USER SEND NEW POLL: ', poll);
     this.socket.emit('add-new-poll', poll);
   }
 
   AddNewUser(user: User) {
-    console.log('Add new user: ', user);
+    console.log('ADD NEW USER: ', user);
     this.socket.emit('add-new-user', user);
   }
 
-  getPoll(url: string) {
-    this.socket.emit('get-poll', url);
+  // getPoll(url: string) {
+  //   console.log('url: ', url);
+  //   // this.socket.on(url, poll => this.pollReceivedSource.next(poll));
+  //   this.socket.emit('get-poll', url);
+  //   io(`${environment.URL}${url}`);
+  // }
+
+  connectToPoll(url: string) {
+    console.log('CONNECTING TO POLL', url);
+    this.socket.emit('connect to poll', url);
+  }
+
+  disconnectFormPoll(url: string) {
+    console.log('DISCONNECT FROM POLL');
+    this.socket.emit('disconnect from poll', url);
   }
 
   SendVote() {

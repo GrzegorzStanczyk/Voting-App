@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Poll, AppState } from '../../app.component.rx';
+import { Poll, AppState, ConnectToPollAction, DisconnectFromPollAction } from '../../app.component.rx';
 import { Observable, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { WebsocketService } from '../../services/websocket.service';
@@ -14,6 +14,7 @@ import { WebsocketService } from '../../services/websocket.service';
 export class ResultComponent implements OnDestroy {
   result$: Observable<Poll>;
   routerSubscription: Subscription;
+  roomUrl: string = '';
 
   constructor(
     private store: Store<AppState>,
@@ -21,11 +22,19 @@ export class ResultComponent implements OnDestroy {
     private router: Router,
     private webSocketService: WebsocketService) {
     this.result$ = store.pipe(select(state => state.voteApp.poll));
-    this.routerSubscription = this.route.queryParams.subscribe(r => this.webSocketService.getPoll(r.poll));
+    this.routerSubscription = this.route.queryParams.subscribe(r => {
+      if (r.poll) {
+        this.store.dispatch(new ConnectToPollAction(r.poll));
+        this.roomUrl = r.poll;
+      }
+    });
   }
 
   ngOnDestroy() {
     this.routerSubscription.unsubscribe();
+    if (this.roomUrl) {
+      this.store.dispatch(new DisconnectFromPollAction(this.roomUrl));
+    }
   }
 
 }
