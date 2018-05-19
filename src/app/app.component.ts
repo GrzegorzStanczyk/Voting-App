@@ -6,6 +6,7 @@ import {
 import { Store, select } from '@ngrx/store';
 import { AppState } from './app.component.rx';
 import { SpinnerComponent } from './spinner/spinner.component';
+import { ModalComponent } from './modal/modal.component';
 
 @Component({
   selector: 'app-root',
@@ -13,18 +14,31 @@ import { SpinnerComponent } from './spinner/spinner.component';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  factory: ComponentFactory<SpinnerComponent>;
+  spinner: ComponentFactory<SpinnerComponent>;
+  modal: ComponentFactory<ModalComponent>;
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
     private viewContainerRef: ViewContainerRef,
     private store: Store<AppState>) {
-      this.factory = this.componentFactoryResolver.resolveComponentFactory(SpinnerComponent);
+      this.spinner = this.componentFactoryResolver.resolveComponentFactory(SpinnerComponent);
+      this.modal = this.componentFactoryResolver.resolveComponentFactory(ModalComponent);
 
       store.pipe(select(state => state.voteApp.pending))
       .subscribe(pending => {
         if (pending) {
-          this.viewContainerRef.createComponent(this.factory);
+          this.viewContainerRef.createComponent(this.spinner);
+        } else {
+          this.viewContainerRef.clear();
+        }
+      });
+
+      store.pipe(select(state => state.voteApp.modalMsg))
+      .subscribe(msg => {
+        if (msg) {
+          const modal = this.viewContainerRef.createComponent(this.modal);
+          modal.instance.description = msg;
+          modal.changeDetectorRef.detectChanges();
         } else {
           this.viewContainerRef.clear();
         }
