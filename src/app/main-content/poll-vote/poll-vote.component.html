@@ -6,7 +6,7 @@
     <p>Poll author: {{poll.author}}</p>
     <form [formGroup]="pollForm" (ngSubmit)="onSubmit()">
       <div class="custom-control custom-radio" *ngFor="let field of poll.fields; index as i">
-        <input type="radio" formControlName="poll" [id]="i" [value]="field.name" class="custom-control-input">
+        <input type="radio" formControlName="poll" [id]="i" [value]="i" class="custom-control-input">
         <label class="custom-control-label" [for]="i">{{field.name}}</label>
       </div>
       <button [disabled]="!!pollForm.invalid" type="submit"class="btn btn-primary">Submit</button>

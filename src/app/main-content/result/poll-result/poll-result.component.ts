@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Poll } from 'app/app.component.rx';
+import { Poll, AppState, GoVoteAction } from 'app/app.component.rx';
 import { environment } from 'environments/environment';
+import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-poll-result',
@@ -12,10 +14,14 @@ export class PollResultComponent implements OnInit {
   delayFlag: boolean = false;
   url: string = environment.BASE_URL;
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
     setTimeout(() => this.delayFlag = true);
+  }
+
+  goVote(url: string) {
+    this.router.navigate(['/poll-vote'], { queryParams: {poll: url} });
   }
 
 }

@@ -20,10 +20,6 @@ export class WebsocketService {
   pollReceived$: Observable<Poll> = this.pollReceivedSource.asObservable();
   noPollInDB$: Observable<string> = this.noPollInDBSource.asObservable();
 
-  // namespace = '5aff33da1b3b3e2b2cc03aa7';
-  // namespace = '5b0019ce01a87104fce407b3';
-  // namespace = '5b0019ce01a87104fce407b7';
-
   constructor() {
     this.socket = io(environment.URL);
 
@@ -39,7 +35,6 @@ export class WebsocketService {
 
     this.socket.on('connected to poll', poll => {
       console.log('CONNECTED TO POLL: ', poll);
-      // io(`${environment.URL}${poll._id}`);
       this.pollReceivedSource.next(poll);
     });
 
@@ -50,6 +45,11 @@ export class WebsocketService {
 
     this.socket.on('user_polls', data => console.log('GET USER POLLS', data));
     this.socket.emit('get_user_polls');
+
+    this.socket.on('new vote', poll => {
+      console.log('FROM ROOM', poll);
+      this.pollReceivedSource.next(poll);
+    });
   }
 
   AddNewPoll(poll: Poll) {
@@ -62,13 +62,6 @@ export class WebsocketService {
     this.socket.emit('add-new-user', user);
   }
 
-  // getPoll(url: string) {
-  //   console.log('url: ', url);
-  //   // this.socket.on(url, poll => this.pollReceivedSource.next(poll));
-  //   this.socket.emit('get-poll', url);
-  //   io(`${environment.URL}${url}`);
-  // }
-
   connectToPoll(url: string) {
     console.log('CONNECTING TO POLL', url);
     this.socket.emit('connect to poll', url);
@@ -79,9 +72,8 @@ export class WebsocketService {
     this.socket.emit('disconnect from poll', url);
   }
 
-  SendVote() {
-
+  SendVote(payload) {
+    console.log('USER VOTE: ', payload);
+    this.socket.emit('vote', payload);
   }
-
-
 }
