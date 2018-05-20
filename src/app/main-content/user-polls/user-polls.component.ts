@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 
-import { Poll, AppState, UserDeletePollAction } from 'app/app.component.rx';
+import { Poll, AppState, UserDeletePollAction, GetUserPollsAction } from 'app/app.component.rx';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -18,6 +18,7 @@ export class UserPollsComponent implements OnInit {
    }
 
   ngOnInit() {
+    this.store.dispatch(new GetUserPollsAction());
   }
 
   deletePoll(i) {

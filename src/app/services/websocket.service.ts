@@ -14,11 +14,13 @@ export class WebsocketService {
   private newUserAddedSource = new Subject<User>();
   private pollReceivedSource = new Subject<Poll>();
   private messageFromServerSource = new Subject<string>();
+  private userPollsReceivedSource = new Subject<any>();
 
   newPollAdded$: Observable<string> = this.newPollAddedSource.asObservable();
   newUserAdded$: Observable<User> = this.newUserAddedSource.asObservable();
   pollReceived$: Observable<Poll> = this.pollReceivedSource.asObservable();
   messageFromServer$: Observable<string> = this.messageFromServerSource.asObservable();
+  userPollsReceived$: Observable<any> = this.userPollsReceivedSource.asObservable();
 
   constructor() {
     this.socket = io(environment.URL);
@@ -43,8 +45,10 @@ export class WebsocketService {
       this.messageFromServerSource.next(message);
     });
 
-    this.socket.on('user_polls', data => console.log('GET USER POLLS', data));
-    this.socket.emit('get_user_polls');
+    this.socket.on('user_polls', data => {
+      console.log('GET USER POLLS', data);
+      this.userPollsReceivedSource.next(data);
+    });
 
     this.socket.on('new vote', poll => {
       console.log('FROM ROOM', poll);
@@ -52,12 +56,12 @@ export class WebsocketService {
     });
   }
 
-  AddNewPoll(poll: Poll) {
+  addNewPoll(poll: Poll) {
     console.log('USER SEND NEW POLL: ', poll);
     this.socket.emit('add-new-poll', poll);
   }
 
-  AddNewUser(user: User) {
+  addNewUser(user: User) {
     console.log('ADD NEW USER: ', user);
     this.socket.emit('add-new-user', user);
   }
@@ -65,6 +69,11 @@ export class WebsocketService {
   connectToPoll(url: string) {
     console.log('CONNECTING TO POLL', url);
     this.socket.emit('connect to poll', url);
+  }
+
+  getUserPolls() {
+    console.log('GET USER POLLS');
+    this.socket.emit('get_user_polls');
   }
 
   disconnectFormPoll(url: string) {

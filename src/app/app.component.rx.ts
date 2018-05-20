@@ -16,7 +16,6 @@ export interface Poll {
   author?: string;
   fields: Field[];
   sum?: number;
-  error?: string;
   _id?: string;
 }
 export interface User {
@@ -86,8 +85,8 @@ const APP_PENDING = 'APP_PENDING';
 const USER_VOTE = 'USER_VOTE_ACTION';
 const USER_DELETE_POLL = 'USER_DELETE_POLL';
 const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
-// const NEW_POLL_ADDED = 'NEW_POLL_ADDED';
-// const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
+const GET_USER_POLLS = 'GET_USER_POLLS';
+const RECEIVED_USER_POLLS = 'RECEIVED_USER_POLLS';
 const USER_SIGN_UP = 'USER_SIGN_UP';
 const CONNECT_TO_POLL = 'CONNECT_TO_POLL';
 const MESSAGE_FROM_SERVER = 'MESSAGE_FROM_SERVER';
@@ -159,6 +158,16 @@ export class NewVoteAction implements Action {
   constructor(public payload: Poll) {}
 }
 
+export class GetUserPollsAction implements Action {
+  readonly type = GET_USER_POLLS;
+}
+
+export class ReceivedUserPollsAction implements Action {
+  readonly type = RECEIVED_USER_POLLS;
+
+  constructor(public payload: Poll[]) {}
+}
+
 export type AppActions =
   | UserVoteAction
   | UserDeletePollAction
@@ -170,7 +179,9 @@ export type AppActions =
   | DisconnectFromPollAction
   | PollReceivedAction
   | CloseModalAction
-  | NewVoteAction;
+  | NewVoteAction
+  | GetUserPollsAction
+  | ReceivedUserPollsAction;
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
@@ -189,6 +200,14 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
     case POLL_RECEIVED :
       state = {...state, poll: {...action.payload, sum: action.payload.fields.reduce((a, b) => a + b.votes, 0)}};
       break;
+    case RECEIVED_USER_POLLS :
+      state = {...state, userPolls: action.payload.map(p => {
+        return {
+          ...p,
+          sum: p.fields.reduce((a, b) => a + b.votes, 0)
+        };
+      })};
+      break;
     case MESSAGE_FROM_SERVER :
       state = {...state, modalMsg: action.payload};
       break;
@@ -206,7 +225,7 @@ export class PollEffects {
   onAddPoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(USER_ADD_NEW_POLL),
     map((action: UserAddNewPollAction) => action.payload),
-    tap((poll: Poll) => this.websocketService.AddNewPoll(poll)),
+    tap((poll: Poll) => this.websocketService.addNewPoll(poll)),
     map(() => new AppPendingAction(true))
   );
 
@@ -216,11 +235,24 @@ export class PollEffects {
   );
 
   @Effect()
-  onConnectToPoll$: Observable<AppActions> = this.actions$.pipe(
+  onConnectToPoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(CONNECT_TO_POLL),
     map((action: ConnectToPollAction) => action.payload),
     tap(pollUrl => this.websocketService.connectToPoll(pollUrl)),
     map(() => new AppPendingAction(true))
+  );
+
+  @Effect()
+  onGetUserPolls$: Observable<AppPendingAction> = this.actions$.pipe(
+    ofType(GET_USER_POLLS),
+    tap(() => this.websocketService.getUserPolls()),
+    map(() => new AppPendingAction(true))
+  );
+
+  @Effect()
+  onUserPollsReceived$: Observable<AppActions> = this.websocketService.userPollsReceived$.pipe(
+    map(res => res.user_polls),
+    switchMap(polls => [new AppPendingAction(false), new ReceivedUserPollsAction(polls)])
   );
 
   @Effect({ dispatch: false })
@@ -250,7 +282,7 @@ export class PollEffects {
   @Effect()
   onSignUp$ = this.actions$.pipe(
     ofType(USER_SIGN_UP),
-    tap(() => this.websocketService.AddNewUser({ name: 'Mark' })),
+    tap(() => this.websocketService.addNewUser({ name: 'Mark' })),
     map(() => new AppPendingAction(true))
   );
 

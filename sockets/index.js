@@ -56,9 +56,7 @@ exports.init = (server, dbs) => {
           error: 'Database add user error'
         });
       })
-      .then(res => {
-        setTimeout(() => socket.emit('new-user-added', res), 1000);
-      })
+      .then(res => socket.emit('new-user-added', res));
     });
 
     socket.on('get_user_polls', data => {
@@ -76,7 +74,7 @@ exports.init = (server, dbs) => {
       ])
       .next((err, result) => {
         if (err) throw err;
-        setTimeout(() => socket.emit('user_polls', result), 1000);
+        socket.emit('user_polls', result);
       });
     })
 
