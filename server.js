@@ -13,7 +13,7 @@ const appRoutes = require('./routes');
 const port = process.env.PORT;
 
 // Initialize only one connection to database.
-initializeDatabases().then(dbs => io.init(server, dbs));
+initializeDatabases().catch(err => console.log('CONNECTION TO MONGODB ERROR', err.message)).then(dbs => io.init(server, dbs));
 
 // Serve only the static files form the dist directory
 app.use(express.static(__dirname + '/dist'));
