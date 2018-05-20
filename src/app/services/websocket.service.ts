@@ -13,12 +13,12 @@ export class WebsocketService {
   private newPollAddedSource = new Subject<string>();
   private newUserAddedSource = new Subject<User>();
   private pollReceivedSource = new Subject<Poll>();
-  private rejectFromServerSource = new Subject<string>();
+  private messageFromServerSource = new Subject<string>();
 
   newPollAdded$: Observable<string> = this.newPollAddedSource.asObservable();
   newUserAdded$: Observable<User> = this.newUserAddedSource.asObservable();
   pollReceived$: Observable<Poll> = this.pollReceivedSource.asObservable();
-  rejectFromServer$: Observable<string> = this.rejectFromServerSource.asObservable();
+  messageFromServer$: Observable<string> = this.messageFromServerSource.asObservable();
 
   constructor() {
     this.socket = io(environment.URL);
@@ -38,9 +38,9 @@ export class WebsocketService {
       this.pollReceivedSource.next(poll);
     });
 
-    this.socket.on('reject', message => {
+    this.socket.on('message', message => {
       console.log('REJECT FROM SERVER: ', message);
-      this.rejectFromServerSource.next(message);
+      this.messageFromServerSource.next(message);
     });
 
     this.socket.on('user_polls', data => console.log('GET USER POLLS', data));

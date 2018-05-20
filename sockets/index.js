@@ -37,12 +37,13 @@ exports.init = (server, dbs) => {
       })
       .then(res => {
           const { fields, _id } = res.ops[0];
-          socket.emit('new-poll-added', _id);
           fields.forEach((p, i) => {
             dbs.collection('counters').insert({ counter: `${_id}${i}`, seq: 0 })
             .catch(err => console.log('COUNTERS INSERT ERROR: ', err))
             .then(() => console.log(`ADDED COUNTER: ${_id}${i}`))
           })
+          socket.emit('new-poll-added', _id);
+          socket.emit('message', 'Well done! You successful added new poll');
           console.log('NEW POLL ADDED');
       })
     });
@@ -94,7 +95,7 @@ exports.init = (server, dbs) => {
           })
       } else {
         console.log('POLL NOT EXIST');
-        return socket.emit('reject', 'Poll not exist in database');
+        return socket.emit('message', 'Poll not exist in database');
       }
     });
 
@@ -104,7 +105,8 @@ exports.init = (server, dbs) => {
       getNextSequence(`${_id}${payload.index}`, dbs)
       .then(votes => {
         dbs.collection('polls').findAndModify(
-          { _id: ObjectId(_id), usersVotedIP: { $ne: address2 } },
+          // { _id: ObjectId(_id), usersVotedIP: { $ne: address2 } },
+          { _id: ObjectId(_id) },
           [],
           { 
             $set: { ["fields." + payload.index + ".votes"]: votes.value.seq }, 
@@ -115,7 +117,7 @@ exports.init = (server, dbs) => {
             else {
               console.log('FIND AND MODIFY SUCCESS: ', doc.value);
               if (!doc.value) {
-                return socket.emit('reject', 'You already voted');
+                return socket.emit('message', 'You already voted');
               }
               io.to(_id).emit('new vote', doc.value);
             }

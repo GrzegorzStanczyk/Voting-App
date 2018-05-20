@@ -90,7 +90,7 @@ const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
 // const POLL_ADDING_ERROR = 'POLL_ADDING_ERROR';
 const USER_SIGN_UP = 'USER_SIGN_UP';
 const CONNECT_TO_POLL = 'CONNECT_TO_POLL';
-const NO_POLL_IN_DB = 'NO_POLL_IN_DB';
+const MESSAGE_FROM_SERVER = 'MESSAGE_FROM_SERVER';
 const DISCONNECT_FORM_POLL = 'DISCONNECT_FORM_POLL';
 const POLL_RECEIVED = 'POLL_RECEIVED';
 const CLOSE_MODAL = 'CLOSE_MODAL';
@@ -137,8 +137,8 @@ export class ConnectToPollAction implements Action {
   constructor(public payload: string) {}
 }
 
-export class RejectFromServerAction implements Action {
-  readonly type = NO_POLL_IN_DB;
+export class MessageFromServerAction implements Action {
+  readonly type = MESSAGE_FROM_SERVER;
 
   constructor(public payload: string) {}
 }
@@ -166,7 +166,7 @@ export type AppActions =
   | AppPendingAction
   | UserSingUpAction
   | ConnectToPollAction
-  | RejectFromServerAction
+  | MessageFromServerAction
   | DisconnectFromPollAction
   | PollReceivedAction
   | CloseModalAction
@@ -189,7 +189,7 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
     case POLL_RECEIVED :
       state = {...state, poll: {...action.payload, sum: action.payload.fields.reduce((a, b) => a + b.votes, 0)}};
       break;
-    case NO_POLL_IN_DB :
+    case MESSAGE_FROM_SERVER :
       state = {...state, modalMsg: action.payload};
       break;
     case CLOSE_MODAL :
@@ -231,8 +231,8 @@ export class PollEffects {
   );
 
   @Effect()
-  onRejectFromServer$: Observable<AppActions> = this.websocketService.rejectFromServer$.pipe(
-    switchMap(msg => [new AppPendingAction(false), new RejectFromServerAction(msg)])
+  onMessageFromServer$: Observable<AppActions> = this.websocketService.messageFromServer$.pipe(
+    switchMap(msg => [new AppPendingAction(false), new MessageFromServerAction(msg)])
   );
 
   @Effect()
