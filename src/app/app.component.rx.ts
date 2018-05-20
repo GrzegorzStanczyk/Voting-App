@@ -137,7 +137,7 @@ export class ConnectToPollAction implements Action {
   constructor(public payload: string) {}
 }
 
-export class NoPollInDBAction implements Action {
+export class RejectFromServerAction implements Action {
   readonly type = NO_POLL_IN_DB;
 
   constructor(public payload: string) {}
@@ -166,7 +166,7 @@ export type AppActions =
   | AppPendingAction
   | UserSingUpAction
   | ConnectToPollAction
-  | NoPollInDBAction
+  | RejectFromServerAction
   | DisconnectFromPollAction
   | PollReceivedAction
   | CloseModalAction
@@ -231,8 +231,8 @@ export class PollEffects {
   );
 
   @Effect()
-  onNoPollInDBS$: Observable<AppActions> = this.websocketService.noPollInDB$.pipe(
-    switchMap(msg => [new AppPendingAction(false), new NoPollInDBAction(msg)])
+  onRejectFromServer$: Observable<AppActions> = this.websocketService.rejectFromServer$.pipe(
+    switchMap(msg => [new AppPendingAction(false), new RejectFromServerAction(msg)])
   );
 
   @Effect()

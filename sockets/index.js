@@ -1,7 +1,6 @@
 const sio = require('socket.io');
 const ObjectId = require('mongodb').ObjectID;
 const getNextSequence = require('../counter');
-
 let io = null;
 
 const auth = 'Grzegorz';
@@ -15,11 +14,20 @@ exports.init = (server, dbs) => {
   io.on('connection', socket => {
     console.log('SOCKET CONNECTED');
 
+    var address = socket.handshake.address;
+    console.log('address: ', address);
+
+    var address2 = socket.request.connection.remoteAddress;
+    console.log('address2: ', address2);
+
+    var address4 = socket.request.client._peername.address;
+    console.log('address4: ', address4);
+
     socket.on('add-new-poll', data => {
       data.author = auth;
       data.user_id = ObjectId(_id);
-      data.sum = 0;
       data.fields = data.fields.map(f => ({name: f.name, votes: 0}));
+      data.usersVotedIP = [];
       dbs.collection('polls').insert(data)
       .catch(err => {
         console.log('DBS INSERT ERROR: ', err);
@@ -86,7 +94,7 @@ exports.init = (server, dbs) => {
           })
       } else {
         console.log('POLL NOT EXIST');
-        return socket.emit('poll not exist', 'Poll not exist in database');
+        return socket.emit('reject', 'Poll not exist in database');
       }
     });
 
@@ -96,20 +104,26 @@ exports.init = (server, dbs) => {
       getNextSequence(`${_id}${payload.index}`, dbs)
       .then(votes => {
         dbs.collection('polls').findAndModify(
-          { _id: ObjectId(_id) },
+          { _id: ObjectId(_id), usersVotedIP: { $ne: address2 } },
           [],
-          { $set: { ["fields." + payload.index + ".votes"]: votes.value.seq } },
+          { 
+            $set: { ["fields." + payload.index + ".votes"]: votes.value.seq }, 
+            $push: { usersVotedIP: address2 } },
           { new: true },
           (err, doc) => {
             if (err) { console.log('FIND AND MODIFY ERROR: ', err); }
             else {
               console.log('FIND AND MODIFY SUCCESS: ', doc.value);
+              if (!doc.value) {
+                return socket.emit('reject', 'You already voted');
+              }
               io.to(_id).emit('new vote', doc.value);
             }
           }
         )
       })
     })
+
     socket.on('disconnect from poll', room => {
       console.log('DISCONNECTED FROM ', room);
       socket.leave(room)

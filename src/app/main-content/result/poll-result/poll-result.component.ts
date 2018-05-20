@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Poll, AppState, GoVoteAction } from 'app/app.component.rx';
+import { Poll, AppState } from 'app/app.component.rx';
 import { environment } from 'environments/environment';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
