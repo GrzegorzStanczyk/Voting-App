@@ -21,8 +21,8 @@ export class UserPollsComponent implements OnInit {
     this.store.dispatch(new GetUserPollsAction());
   }
 
-  deletePoll(i) {
-    this.store.dispatch(new UserDeletePollAction(i));
+  deletePoll(poll: Poll) {
+    this.store.dispatch(new UserDeletePollAction(poll));
   }
 
 }

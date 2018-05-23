@@ -12,9 +12,9 @@ import { WebsocketService } from '../../services/websocket.service';
   styleUrls: ['./result.component.scss']
 })
 export class ResultComponent implements OnDestroy {
+  private routerSubscription: Subscription;
+  private roomUrl: string = '';
   result$: Observable<Poll>;
-  routerSubscription: Subscription;
-  roomUrl: string = '';
 
   constructor(
     private store: Store<AppState>,

@@ -105,7 +105,7 @@ export class UserVoteAction implements Action {
 export class UserDeletePollAction implements Action {
   readonly type = USER_DELETE_POLL;
 
-  constructor(public payload: number) {}
+  constructor(public payload: Poll) {}
 }
 
 export class UserAddNewPollAction implements Action {
@@ -191,7 +191,8 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
     //   state = {...state, poll: {...state.poll, fields, sum}};
     //   break;
     case USER_DELETE_POLL :
-      state.userPolls.splice(action.payload, 1);
+      console.log('action.payload: ', action.payload);
+      // state.userPolls.splice(action.payload, 1);
       state = {...state};
       break;
     case APP_PENDING :
@@ -276,7 +277,7 @@ export class PollEffects {
   onUserVote$ = this.actions$.pipe(
     ofType(USER_VOTE),
     map((action: UserVoteAction) => action.payload),
-    tap(payload => this.websocketService.SendVote(payload))
+    tap(payload => this.websocketService.sendVote(payload))
   );
 
   @Effect()
@@ -290,6 +291,14 @@ export class PollEffects {
   onAddedNewUser$: Observable<AppActions> = this.websocketService.newUserAdded$.pipe(
     map(() => new AppPendingAction(false)),
     tap(res => this.router.navigate(['/']))
+  );
+
+  @Effect()
+  onUserDeletePoll$: Observable<AppPendingAction> = this.actions$.pipe(
+    ofType(USER_DELETE_POLL),
+    map((action: UserDeletePollAction) => action.payload),
+    tap((poll: Poll) => this.websocketService.deletePoll(poll)),
+    map(() => new AppPendingAction(true))
   );
 
   constructor(

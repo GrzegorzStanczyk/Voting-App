@@ -122,7 +122,25 @@ exports.init = (server, dbs) => {
           }
         )
       })
-    })
+    });
+
+    socket.on('delete poll', poll => {
+      const { _id } = poll;
+      dbs.collection('polls').deleteOne({ _id: ObjectId(_id) }, (err, doc) => {
+        if (err) { 
+          console.log('DELETE FIELD ERROR: ', err); 
+          return socket.emit('message', 'Deleting poll error');
+        } else {
+          console.log('FIELD DELETE SUCCESS: ');
+          socket.emit('delete poll success')
+          const reg = new RegExp(_id)
+          dbs.collection('counters').deleteMany({ counter: reg }, (err, doc) => {
+            if (err) console.log('COUNTERS DELETE ERROR', err)
+            else console.log('COUNTERS DELETE SUCCESS')
+          });
+        }
+      });
+    });
 
     socket.on('disconnect from poll', room => {
       console.log('DISCONNECTED FROM ', room);

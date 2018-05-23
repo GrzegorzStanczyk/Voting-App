@@ -54,6 +54,11 @@ export class WebsocketService {
       console.log('FROM ROOM', poll);
       this.pollReceivedSource.next(poll);
     });
+
+    this.socket.on('delete poll success', () => {
+      console.log('DELETE SUCCESS');
+      this.getUserPolls();
+    });
   }
 
   addNewPoll(poll: Poll) {
@@ -81,8 +86,13 @@ export class WebsocketService {
     this.socket.emit('disconnect from poll', url);
   }
 
-  SendVote(payload) {
+  sendVote(payload) {
     console.log('USER VOTE: ', payload);
     this.socket.emit('vote', payload);
+  }
+
+  deletePoll(poll: Poll) {
+    console.log('USER DELETE POLL: ', poll);
+    this.socket.emit('delete poll', poll);
   }
 }
