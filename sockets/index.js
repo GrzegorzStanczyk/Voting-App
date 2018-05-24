@@ -3,6 +3,25 @@ const ObjectId = require('mongodb').ObjectID;
 const getNextSequence = require('../counter');
 let io = null;
 
+const connectToPoll = (room, dbs, socket) => {
+  if (ObjectId.isValid(room)) {
+    dbs.collection('polls').findOne({ _id: ObjectId(room) })
+      .catch(err => console.log('GET POLL ERROR', err))
+      .then(poll => {
+        if (!poll) {
+          console.log('POLL NOT EXIST');
+          return socket.emit('message', 'Poll not exist in database');
+        }
+        console.log('JOINED ROOM : ', poll._id);
+        socket.join(room);
+        socket.emit('connected to poll', poll)
+      })
+  } else {
+    console.log('POLL NOT EXIST');
+    return socket.emit('message', 'Poll not exist in database');
+  }
+}
+
 const auth = 'Grzegorz';
 const _id = '5af9f1ea790b260380da5e0e'
 
@@ -75,26 +94,28 @@ exports.init = (server, dbs) => {
       .next((err, result) => {
         if (err) throw err;
         socket.emit('user_polls', result);
+        result.user_polls.forEach(r => connectToPoll(r._id, dbs, socket));
       });
     })
 
     socket.on('connect to poll', room => {
-      if (ObjectId.isValid(room)) {
-        dbs.collection('polls').findOne({ _id: ObjectId(room) })
-          .catch(err => console.log('GET POLL ERROR', err))
-          .then(poll => {
-            if (!poll) {
-              console.log('POLL NOT EXIST');
-              return socket.emit('poll not exist', 'Poll not exist in database');
-            }
-            console.log('JOINED ROOM : ', poll._id);
-            socket.join(room);
-            socket.emit('connected to poll', poll)
-          })
-      } else {
-        console.log('POLL NOT EXIST');
-        return socket.emit('message', 'Poll not exist in database');
-      }
+      connectToPoll(room, dbs, socket);
+      // if (ObjectId.isValid(room)) {
+      //   dbs.collection('polls').findOne({ _id: ObjectId(room) })
+      //     .catch(err => console.log('GET POLL ERROR', err))
+      //     .then(poll => {
+      //       if (!poll) {
+      //         console.log('POLL NOT EXIST');
+      //         return socket.emit('message', 'Poll not exist in database');
+      //       }
+      //       console.log('JOINED ROOM : ', poll._id);
+      //       socket.join(room);
+      //       socket.emit('connected to poll', poll)
+      //     })
+      // } else {
+      //   console.log('POLL NOT EXIST');
+      //   return socket.emit('message', 'Poll not exist in database');
+      // }
     });
 
     socket.on('vote', payload => {

@@ -1,4 +1,4 @@
-<div class="card text-center" *ngIf="(poll$ | async) as poll; else loading">
+<div class="card text-center" *ngIf="(poll$ | async) as poll">
   <div class="card-header">
     {{poll.title}}
   </div>
@@ -16,9 +16,5 @@
     Number of options: {{poll.fields.length}}
   </div>
 </div>
-
-<ng-template #loading>
-  Loading stuff...
-</ng-template>
 
 <app-result></app-result>

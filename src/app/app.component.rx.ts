@@ -34,48 +34,8 @@ export interface AppState  {
 
 const initialState: VoteApp  = {
   user: {name: 'Oskar'},
-  userPolls: [
-    {
-      title: 'Who is your hero?',
-      author: 'Janek',
-      fields: [
-        { name: 'Batman', votes: 20 },
-        { name: 'Superman', votes: 40 },
-        { name: 'Captain America', votes: 20 }
-      ],
-      sum: 80
-    },
-    {
-      title: 'Who is your hero?',
-      author: 'Janek',
-      fields: [
-        { name: 'CatWoman', votes: 100 },
-        { name: 'Barbie', votes: 10 },
-        { name: 'SuperGirl', votes: 20 }
-      ],
-      sum: 130
-    },
-    {
-      title: 'Who is your hero?',
-      author: 'Janek',
-      fields: [
-        { name: 'Hulk', votes: 50 },
-        { name: 'IronMan', votes: 40 },
-        { name: 'Thor', votes: 60 }
-      ],
-      sum: 140
-    }
-  ],
-  poll: {
-    title: 'Who is your hero?',
-    author: 'Janek',
-    fields: [
-      { name: 'Batman', votes: 90 },
-      { name: 'Superman', votes: 45 },
-      { name: 'Captain America', votes: 5 }
-    ],
-    sum: 140
-  },
+  userPolls: [],
+  poll: null,
   pending: false,
   modalMsg: ''
 };
@@ -185,21 +145,18 @@ export type AppActions =
 
 export function appReducer(state: VoteApp = initialState, action: AppActions) {
   switch (action.type) {
-    // case USER_VOTE :
-    //   const fields = state.poll.fields.map((v, i) => i === action.payload ? {name: v.name, votes: ++v.votes} : v);
-    //   const sum = fields.reduce((a, b) => a + b.votes, 0);
-    //   state = {...state, poll: {...state.poll, fields, sum}};
-    //   break;
-    case USER_DELETE_POLL :
-      console.log('action.payload: ', action.payload);
-      // state.userPolls.splice(action.payload, 1);
-      state = {...state};
-      break;
     case APP_PENDING :
       state = {...state, pending: action.payload};
       break;
     case POLL_RECEIVED :
-      state = {...state, poll: {...action.payload, sum: action.payload.fields.reduce((a, b) => a + b.votes, 0)}};
+      state = {...state,
+        poll: {...action.payload,
+          sum: action.payload.fields.reduce((a, b) => a + b.votes, 0)
+        },
+        userPolls: state.userPolls.map(p => p._id === action.payload._id
+          ? {...action.payload, sum: action.payload.fields.reduce((a, b) => a + b.votes, 0)}
+          : p)
+      };
       break;
     case RECEIVED_USER_POLLS :
       state = {...state, userPolls: action.payload.map(p => {
