@@ -85,6 +85,10 @@ exports.init = (server, dbs) => {
       ])
       .next((err, result) => {
         if (err) throw err;
+        if (!result) {
+          console.log('NO POLLS IN DATABASE');
+          return socket.emit('message', 'You don`t have any polls stored');
+        }
         socket.emit('user_polls', result);
         result.user_polls.forEach(r => connectToPoll(r._id, dbs, socket));
       });
