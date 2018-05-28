@@ -190,7 +190,7 @@ export class PollEffects {
     ofType(USER_ADD_NEW_POLL),
     map((action: UserAddNewPollAction) => action.payload),
     tap((poll: Poll) => this.websocketService.addNewPoll(poll)),
-    map(() => new AppPendingAction(true))
+    mapTo(new AppPendingAction(true))
   );
 
   @Effect({ dispatch: false})
@@ -203,14 +203,14 @@ export class PollEffects {
     ofType(CONNECT_TO_POLL),
     map((action: ConnectToPollAction) => action.payload),
     tap(pollUrl => this.websocketService.connectToPoll(pollUrl)),
-    map(() => new AppPendingAction(true))
+    mapTo(new AppPendingAction(true))
   );
 
   @Effect()
   onGetUserPolls$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(GET_USER_POLLS),
     tap(() => this.websocketService.getUserPolls()),
-    map(() => new AppPendingAction(true))
+    mapTo(new AppPendingAction(true))
   );
 
   @Effect()
