@@ -3,21 +3,41 @@
     Sign Up
   </div>
   <div class="card-body">
-    <form>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
-        <input autocomplete="off" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        <input
+          formControlName="email"
+          autocomplete="off"
+          type="email"
+          class="form-control"
+          id="exampleInputEmail1"
+          aria-describedby="emailHelp"
+          placeholder="Enter email">
         <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
       </div>
       <div class="form-group">
         <label for="exampleInputPassword1">Password</label>
-        <input autocomplete="off" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        <input
+          formControlName="password"
+          autocomplete="off"
+          type="password"
+          class="form-control"
+          id="exampleInputPassword1"
+          placeholder="Password">
       </div>
-      <div class="form-check">
+      <div class="form-group honey">
+        <label for="honey"></label>
+        <input 
+          formControlName="honey"
+          type="text"
+          id="honey">
+      </div>
+      <!-- <div class="form-check">
         <input autocomplete="off" type="checkbox" class="form-check-input" id="exampleCheck1">
         <label class="form-check-label" for="exampleCheck1">Check me out</label>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      </div> -->
+      <button [disabled]="!!form.invalid" type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
 </div>

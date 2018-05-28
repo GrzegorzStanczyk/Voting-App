@@ -4,8 +4,9 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { MainContentModule } from './main-content/main-content.module';
-import { AppRoutingModule } from './/app-routing.module';
+import { AppRoutingModule } from './app-routing.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { environment } from '../environments/environment';
 import { appReducer, PollEffects } from './app.component.rx';
@@ -38,7 +39,9 @@ import { ModalComponent } from './modal/modal.component';
     EffectsModule.forRoot([PollEffects]),
     StoreDevtoolsModule.instrument(),
     AppRoutingModule,
-    MainContentModule
+    MainContentModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   entryComponents: [SpinnerComponent, ModalComponent],
   providers: [],

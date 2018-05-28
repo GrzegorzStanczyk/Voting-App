@@ -3,3 +3,14 @@
   justify-content: center;
   align-items: center;
 }
+
+.honey { 
+  border: 0;
+  height: 0;
+  padding: 0;
+  * {
+    border: inherit;
+    height: inherit;
+    padding: inherit;
+  }
+}

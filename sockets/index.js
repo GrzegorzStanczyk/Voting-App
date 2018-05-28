@@ -1,27 +1,10 @@
 const sio = require('socket.io');
 const ObjectId = require('mongodb').ObjectID;
 const getNextSequence = require('../counter');
+const connectToPoll = require('./connect-to-poll.js');
+const bcrypt = require('bcryptjs');
+
 let io = null;
-
-const connectToPoll = (room, dbs, socket) => {
-  if (ObjectId.isValid(room)) {
-    dbs.collection('polls').findOne({ _id: ObjectId(room) })
-      .catch(err => console.log('GET POLL ERROR', err))
-      .then(poll => {
-        if (!poll) {
-          console.log('POLL NOT EXIST');
-          return socket.emit('message', 'Poll not exist in database');
-        }
-        console.log('JOINED ROOM : ', poll._id);
-        socket.join(room);
-        socket.emit('connected to poll', poll)
-      })
-  } else {
-    console.log('POLL NOT EXIST');
-    return socket.emit('message', 'Poll not exist in database');
-  }
-}
-
 const auth = 'Grzegorz';
 const _id = '5af9f1ea790b260380da5e0e'
 
@@ -68,14 +51,23 @@ exports.init = (server, dbs) => {
     });
   
     socket.on('add-new-user', data => {
-      dbs.collection('users').insert(data)
-      .catch(err => {
-        console.log('DBS ADD NEW USER ERROR: ', err);
-        socket.emit('new-user-added', {
-          error: 'Database add user error'
-        });
+      dbs.collection('users').findOne({ email: data.email }, (err, result) => {
+        if (err) {
+          console.log('DBS FIND NEW USER ERROR: ', err);
+          return socket.emit('message', 'Database error');
+        }
+        if (!result) {
+          dbs.collection('users').insert({ email: data.email, password: bcrypt.hashSync(data.password) })
+          .catch(err => {
+            console.log('DBS ADD NEW USER ERROR: ', err);
+            return socket.emit('message', 'Database add user error');
+          })
+          .then(res => socket.emit('new-user-added'), console.log('NEW USER ADDED'));
+        } else {
+          console.log('USER EXIST IN DATABASE');
+          return socket.emit('message', 'User exist in our database');
+        }
       })
-      .then(res => socket.emit('new-user-added', res));
     });
 
     socket.on('get_user_polls', data => {
@@ -100,22 +92,6 @@ exports.init = (server, dbs) => {
 
     socket.on('connect to poll', room => {
       connectToPoll(room, dbs, socket);
-      // if (ObjectId.isValid(room)) {
-      //   dbs.collection('polls').findOne({ _id: ObjectId(room) })
-      //     .catch(err => console.log('GET POLL ERROR', err))
-      //     .then(poll => {
-      //       if (!poll) {
-      //         console.log('POLL NOT EXIST');
-      //         return socket.emit('message', 'Poll not exist in database');
-      //       }
-      //       console.log('JOINED ROOM : ', poll._id);
-      //       socket.join(room);
-      //       socket.emit('connected to poll', poll)
-      //     })
-      // } else {
-      //   console.log('POLL NOT EXIST');
-      //   return socket.emit('message', 'Poll not exist in database');
-      // }
     });
 
     socket.on('vote', payload => {

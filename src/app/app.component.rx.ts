@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Action } from '@ngrx/store';
-import { Store, select } from '@ngrx/store';
+import { Action, Store, select } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { switchMap, map, tap } from 'rxjs/operators';
+import { switchMap, map, tap, mapTo } from 'rxjs/operators';
 import { WebsocketService } from './services/websocket.service';
 
 export interface Field {
   name: string;
   votes?: number;
 }
+export interface SignUp {
+  email: string;
+  password: string;
+}
+
 export interface Poll {
   title: string;
   author?: string;
@@ -82,6 +86,8 @@ export class AppPendingAction implements Action {
 
 export class UserSingUpAction implements Action {
   readonly type = USER_SIGN_UP;
+
+  constructor(public payload: SignUp) {}
 }
 
 export class PollReceivedAction implements Action {
@@ -238,16 +244,17 @@ export class PollEffects {
   );
 
   @Effect()
-  onSignUp$ = this.actions$.pipe(
+  onSignUp$: Observable<UserSingUpAction | AppPendingAction> = this.actions$.pipe(
     ofType(USER_SIGN_UP),
-    tap(() => this.websocketService.addNewUser({ name: 'Mark' })),
-    map(() => new AppPendingAction(true))
+    map((action: UserSingUpAction) => action.payload),
+    tap((data) => this.websocketService.addNewUser(data)),
+    mapTo(new AppPendingAction(true))
   );
 
   @Effect()
   onAddedNewUser$: Observable<AppActions> = this.websocketService.newUserAdded$.pipe(
-    map(() => new AppPendingAction(false)),
-    tap(res => this.router.navigate(['/']))
+    mapTo(new AppPendingAction(false)),
+    tap(() => this.router.navigate(['/sign-in']))
   );
 
   @Effect()
@@ -255,7 +262,7 @@ export class PollEffects {
     ofType(USER_DELETE_POLL),
     map((action: UserDeletePollAction) => action.payload),
     tap((poll: Poll) => this.websocketService.deletePoll(poll)),
-    map(() => new AppPendingAction(true))
+    mapTo(new AppPendingAction(true))
   );
 
   constructor(

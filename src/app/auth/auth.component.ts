@@ -14,9 +14,4 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
   }
-
-  signUp() {
-    this.store.dispatch(new UserSingUpAction());
-  }
-
 }

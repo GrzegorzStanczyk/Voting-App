@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as io from 'socket.io-client';
 import { environment } from 'environments/environment';
-import { Poll, User } from '../app.component.rx';
+import { Poll, User, SignUp } from '../app.component.rx';
 import { Observable, Subject } from 'rxjs';
 
 
@@ -31,8 +31,8 @@ export class WebsocketService {
     });
 
     this.socket.on('new-user-added', data => {
-      console.log('new-user-added', data);
-      this.newUserAddedSource.next(data);
+      console.log('new-user-added');
+      this.newUserAddedSource.next();
     });
 
     this.socket.on('connected to poll', poll => {
@@ -66,7 +66,7 @@ export class WebsocketService {
     this.socket.emit('add-new-poll', poll);
   }
 
-  addNewUser(user: User) {
+  addNewUser(user: SignUp) {
     console.log('ADD NEW USER: ', user);
     this.socket.emit('add-new-user', user);
   }
