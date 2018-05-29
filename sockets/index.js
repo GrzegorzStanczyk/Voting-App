@@ -57,7 +57,7 @@ exports.init = (server, dbs) => {
           return socket.emit('message', 'Database error');
         }
         if (!result) {
-          dbs.collection('users').insert({ email: data.email, password: bcrypt.hashSync(data.password) })
+          dbs.collection('users').insert({ name: data.name, email: data.email, password: bcrypt.hashSync(data.password) })
           .catch(err => {
             console.log('DBS ADD NEW USER ERROR: ', err);
             return socket.emit('message', 'Database add user error');
