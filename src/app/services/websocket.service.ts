@@ -12,12 +12,14 @@ export class WebsocketService {
   private socket: SocketIOClient.Socket;
   private newPollAddedSource = new Subject<string>();
   private newUserAddedSource = new Subject<User>();
+  private userSignedInSource = new Subject<User>();
   private pollReceivedSource = new Subject<Poll>();
   private messageFromServerSource = new Subject<string>();
   private userPollsReceivedSource = new Subject<any>();
 
   newPollAdded$: Observable<string> = this.newPollAddedSource.asObservable();
   newUserAdded$: Observable<User> = this.newUserAddedSource.asObservable();
+  userSignedIn$: Observable<User> = this.userSignedInSource.asObservable();
   pollReceived$: Observable<Poll> = this.pollReceivedSource.asObservable();
   messageFromServer$: Observable<string> = this.messageFromServerSource.asObservable();
   userPollsReceived$: Observable<any> = this.userPollsReceivedSource.asObservable();
@@ -31,8 +33,13 @@ export class WebsocketService {
     });
 
     this.socket.on('new-user-added', data => {
-      console.log('new-user-added');
+      console.log('NEW USER ADDED');
       this.newUserAddedSource.next();
+    });
+
+    this.socket.on('user-login-success', user => {
+      console.log('USER SIGNED IN');
+      this.userSignedInSource.next(user);
     });
 
     this.socket.on('connected to poll', poll => {
@@ -69,6 +76,11 @@ export class WebsocketService {
   addNewUser(user: SignUp) {
     console.log('ADD NEW USER: ', user);
     this.socket.emit('add-new-user', user);
+  }
+
+  signInUser(user: SignUp) {
+    console.log('SIGN IN USER: ');
+    this.socket.emit('sign-in-user', user);
   }
 
   connectToPoll(url: string) {

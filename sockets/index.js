@@ -3,6 +3,7 @@ const ObjectId = require('mongodb').ObjectID;
 const getNextSequence = require('../counter');
 const connectToPoll = require('./connect-to-poll.js');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 let io = null;
 const auth = 'Grzegorz';
@@ -57,7 +58,7 @@ exports.init = (server, dbs) => {
           return socket.emit('message', 'Database error');
         }
         if (!result) {
-          dbs.collection('users').insert({ name: data.name, email: data.email, password: bcrypt.hashSync(data.password) })
+          dbs.collection('users').insert({ name: data.name, email: data.email, password: bcrypt.hashSync(data.password, 10) })
           .catch(err => {
             console.log('DBS ADD NEW USER ERROR: ', err);
             return socket.emit('message', 'Database add user error');
@@ -69,6 +70,27 @@ exports.init = (server, dbs) => {
         }
       })
     });
+
+    socket.on('sign-in-user', data => {
+      dbs.collection('users').findOne({ email: data.email }, (err, result) => {
+        if (err) {
+          console.log('DBS LOGIN ERROR: ', err);
+          return socket.emit('message', 'Database error');
+        }
+        if (!result) {
+          console.log('USER DONT EXIST IN DATABASE');
+          return socket.emit('message', 'Invalid login credentials');
+        }
+        const { name, email, _id, password} = result;
+        if (!bcrypt.compareSync(data.password, password)) {
+          console.log('USER INSERT INCORRECT PASSWORD');
+          return socket.emit('message', 'Invalid login credentials');
+        }
+        const token = jwt.sign({user: { name, email, _id}}, process.env.SECRET);
+        console.log('USER SIGN IN SUCCESS');
+        socket.emit('user-login-success', {name, email, token});
+      })
+    })
 
     socket.on('get_user_polls', data => {
       dbs.collection('users').aggregate([

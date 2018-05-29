@@ -11,6 +11,7 @@ export interface Field {
   votes?: number;
 }
 export interface SignUp {
+  name?: string;
   email: string;
   password: string;
 }
@@ -24,6 +25,8 @@ export interface Poll {
 }
 export interface User {
   name: string;
+  email?: string;
+  _id?: string;
 }
 export interface VoteApp  {
   user: User;
@@ -37,8 +40,8 @@ export interface AppState  {
 }
 
 const initialState: VoteApp  = {
-  user: {name: 'Oskar'},
-  userPolls: [],
+  user: null,
+  userPolls: null,
   poll: null,
   pending: false,
   modalMsg: ''
@@ -52,6 +55,8 @@ const USER_ADD_NEW_POLL = 'USER_ADD_NEW_POLL';
 const GET_USER_POLLS = 'GET_USER_POLLS';
 const RECEIVED_USER_POLLS = 'RECEIVED_USER_POLLS';
 const USER_SIGN_UP = 'USER_SIGN_UP';
+const USER_SIGN_IN = 'USER_SIGN_IN';
+const USER_SIGNED_IN = 'USER_SIGNED_IN';
 const CONNECT_TO_POLL = 'CONNECT_TO_POLL';
 const MESSAGE_FROM_SERVER = 'MESSAGE_FROM_SERVER';
 const DISCONNECT_FORM_POLL = 'DISCONNECT_FORM_POLL';
@@ -88,6 +93,18 @@ export class UserSingUpAction implements Action {
   readonly type = USER_SIGN_UP;
 
   constructor(public payload: SignUp) {}
+}
+
+export class UserSingInAction implements Action {
+  readonly type = USER_SIGN_IN;
+
+  constructor(public payload: SignUp) {}
+}
+
+export class UserSingedInAction implements Action {
+  readonly type = USER_SIGNED_IN;
+
+  constructor(public payload: User) {}
 }
 
 export class PollReceivedAction implements Action {
@@ -140,6 +157,8 @@ export type AppActions =
   | UserAddNewPollAction
   | AppPendingAction
   | UserSingUpAction
+  | UserSingedInAction
+  | UserSingInAction
   | ConnectToPollAction
   | MessageFromServerAction
   | DisconnectFromPollAction
@@ -177,6 +196,10 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       break;
     case CLOSE_MODAL :
       state = {...state, modalMsg: ''};
+      break;
+    case USER_SIGNED_IN :
+      state = {...state, user: action.payload};
+      break;
   }
   return state;
 }
@@ -249,6 +272,20 @@ export class PollEffects {
     map((action: UserSingUpAction) => action.payload),
     tap((data) => this.websocketService.addNewUser(data)),
     mapTo(new AppPendingAction(true))
+  );
+
+  @Effect()
+  onSignIn$: Observable<UserSingInAction | AppPendingAction> = this.actions$.pipe(
+    ofType(USER_SIGN_IN),
+    map((action: UserSingInAction) => action.payload),
+    tap((data) => this.websocketService.signInUser(data)),
+    mapTo(new AppPendingAction(true))
+  );
+
+  @Effect()
+  onSignedIn$: Observable<AppActions> = this.websocketService.userSignedIn$.pipe(
+    switchMap(user => [new AppPendingAction(false), new UserSingedInAction(user)]),
+    tap(() => this.router.navigate(['/']))
   );
 
   @Effect()

@@ -26,8 +26,8 @@ export class SignUpComponent {
 
   onSubmit() {
     if (this.form.invalid) return;
-    const { email, password } = this.form.value;
-    this.store.dispatch(new UserSingUpAction({ email, password}));
+    const { name, email, password } = this.form.value;
+    this.store.dispatch(new UserSingUpAction({ name, email, password}));
   }
 
 }

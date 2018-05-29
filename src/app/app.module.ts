@@ -20,6 +20,7 @@ import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ModalComponent } from './modal/modal.component';
+import { SignInComponent } from './auth/sign-in/sign-in.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { ModalComponent } from './modal/modal.component';
     NavigationComponent,
     DashboardComponent,
     SpinnerComponent,
-    ModalComponent
+    ModalComponent,
+    SignInComponent
   ],
   imports: [
     BrowserModule,
