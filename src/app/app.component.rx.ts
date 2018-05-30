@@ -27,6 +27,7 @@ export interface User {
   name: string;
   email?: string;
   _id?: string;
+  token?: string;
 }
 export interface VoteApp  {
   user: User;
@@ -57,6 +58,7 @@ const RECEIVED_USER_POLLS = 'RECEIVED_USER_POLLS';
 const USER_SIGN_UP = 'USER_SIGN_UP';
 const USER_SIGN_IN = 'USER_SIGN_IN';
 const USER_SIGNED_IN = 'USER_SIGNED_IN';
+const USER_LOG_OUT = 'USER_LOG_OUT';
 const CONNECT_TO_POLL = 'CONNECT_TO_POLL';
 const MESSAGE_FROM_SERVER = 'MESSAGE_FROM_SERVER';
 const DISCONNECT_FORM_POLL = 'DISCONNECT_FORM_POLL';
@@ -105,6 +107,10 @@ export class UserSingedInAction implements Action {
   readonly type = USER_SIGNED_IN;
 
   constructor(public payload: User) {}
+}
+
+export class UserLogOutnAction implements Action {
+  readonly type = USER_LOG_OUT;
 }
 
 export class PollReceivedAction implements Action {
@@ -159,6 +165,7 @@ export type AppActions =
   | UserSingUpAction
   | UserSingedInAction
   | UserSingInAction
+  | UserLogOutnAction
   | ConnectToPollAction
   | MessageFromServerAction
   | DisconnectFromPollAction
@@ -199,6 +206,9 @@ export function appReducer(state: VoteApp = initialState, action: AppActions) {
       break;
     case USER_SIGNED_IN :
       state = {...state, user: action.payload};
+      break;
+    case USER_LOG_OUT :
+      state = {...state, user: null };
       break;
   }
   return state;
@@ -284,8 +294,18 @@ export class PollEffects {
 
   @Effect()
   onSignedIn$: Observable<AppActions> = this.websocketService.userSignedIn$.pipe(
-    switchMap(user => [new AppPendingAction(false), new UserSingedInAction(user)]),
-    tap(() => this.router.navigate(['/']))
+    tap(user => this.store.dispatch(new AppPendingAction(false))),
+    map(user => {
+      localStorage.setItem('jwt_token', user.token);
+      this.router.navigate(['/']);
+      return new UserSingedInAction(user);
+    })
+  );
+
+  @Effect({ dispatch: false })
+  onUserLogOut$ = this.actions$.pipe(
+    ofType(USER_LOG_OUT),
+    tap(() => localStorage.removeItem('jwt_token'))
   );
 
   @Effect()
@@ -305,5 +325,6 @@ export class PollEffects {
   constructor(
     private actions$: Actions,
     private websocketService: WebsocketService,
-    private router: Router) {}
+    private router: Router,
+    private store: Store<AppState>) {}
 }

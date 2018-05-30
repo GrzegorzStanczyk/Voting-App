@@ -97,7 +97,7 @@ exports.init = (server, dbs) => {
         }
         const token = jwt.sign({user: { name, email, _id}}, process.env.SECRET);
         console.log('USER SIGN IN SUCCESS');
-        socket.emit('user-login-success', {name, email, token});
+        socket.emit('user-login-success', {name, email, token, _id });
       })
     })
 
