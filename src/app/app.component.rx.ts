@@ -305,7 +305,10 @@ export class PollEffects {
   @Effect({ dispatch: false })
   onUserLogOut$ = this.actions$.pipe(
     ofType(USER_LOG_OUT),
-    tap(() => localStorage.removeItem('jwt_token'))
+    tap(() => {
+      localStorage.removeItem('jwt_token');
+      this.router.navigate(['/']);
+    })
   );
 
   @Effect()

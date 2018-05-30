@@ -2,7 +2,8 @@ import {
   Component,
   ComponentFactoryResolver,
   ViewContainerRef,
-  ComponentFactory} from '@angular/core';
+  ComponentFactory,
+  OnInit} from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './app.component.rx';
 import { SpinnerComponent } from './spinner/spinner.component';
@@ -13,7 +14,7 @@ import { ModalComponent } from './modal/modal.component';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   spinner: ComponentFactory<SpinnerComponent>;
   modal: ComponentFactory<ModalComponent>;
 
@@ -44,4 +45,9 @@ export class AppComponent {
         }
       });
     }
+  ngOnInit() {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+    }
+  }
 }
