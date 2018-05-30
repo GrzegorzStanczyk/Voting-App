@@ -4,6 +4,7 @@ const getNextSequence = require('../counter');
 const connectToPoll = require('./connect-to-poll.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 let io = null;
 const auth = 'Grzegorz';
@@ -52,6 +53,14 @@ exports.init = (server, dbs) => {
     });
   
     socket.on('add-new-user', data => {
+      if (!validator.isEmail(data.email)) {
+        console.log('INVALID SIGN UP EMAIL');
+        return socket.emit('message', 'Invalid email');
+      }
+      if (!validator.isLength(data.password, 4)) {
+        console.log('INVALID SIGN UP PASSWORD LENGTH');
+        return socket.emit('message', 'Invalid password length');
+      }
       dbs.collection('users').findOne({ email: data.email }, (err, result) => {
         if (err) {
           console.log('DBS FIND NEW USER ERROR: ', err);
