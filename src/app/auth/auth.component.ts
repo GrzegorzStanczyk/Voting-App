@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AppState, UserLogOutnAction } from '../app.component.rx';
+import { Component, Input } from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { AppState, UserLogOutnAction, User } from '../app.component.rx';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-auth',
@@ -8,9 +9,8 @@ import { AppState, UserLogOutnAction } from '../app.component.rx';
   styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent {
-
-  constructor(
-    private store: Store<AppState>) { }
+  @Input() user: User;
+  constructor(private store: Store<AppState>) { }
 
   logOut() {
     this.store.dispatch(new UserLogOutnAction());

@@ -5,9 +5,10 @@ import {
   ComponentFactory,
   OnInit} from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { AppState, UserSingInAction } from './app.component.rx';
+import { AppState, UserSingInAction, User } from './app.component.rx';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ModalComponent } from './modal/modal.component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ import { ModalComponent } from './modal/modal.component';
 export class AppComponent implements OnInit {
   spinner: ComponentFactory<SpinnerComponent>;
   modal: ComponentFactory<ModalComponent>;
+  user$: Observable<User>;
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -24,6 +26,7 @@ export class AppComponent implements OnInit {
     private store: Store<AppState>) {
       this.spinner = this.componentFactoryResolver.resolveComponentFactory(SpinnerComponent);
       this.modal = this.componentFactoryResolver.resolveComponentFactory(ModalComponent);
+      this.user$ = this.store.pipe(select(state => state.voteApp.user));
 
       store.pipe(select(state => state.voteApp.pending))
       .subscribe(pending => {

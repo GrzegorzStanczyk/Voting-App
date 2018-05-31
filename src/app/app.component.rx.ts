@@ -301,9 +301,10 @@ export class PollEffects {
     })
   );
 
-  @Effect({ dispatch: false })
-  onUserLogOut$ = this.actions$.pipe(
+  @Effect()
+  onUserLogOut$: Observable<MessageFromServerAction> = this.actions$.pipe(
     ofType(USER_LOG_OUT),
+    mapTo(new MessageFromServerAction('You have been logged out')),
     tap(() => {
       localStorage.removeItem('jwt_voting-app');
       this.router.navigate(['/']);

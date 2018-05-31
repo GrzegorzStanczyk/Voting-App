@@ -1,9 +1,12 @@
 <div class="container text-center">
-  <!-- <h1 class="display-4 text-center">Voting App</h1>
-  <p class="lead text-center">Create custom polls with live results.</p> -->
-  <!-- <button type="button" class="btn btn-success">Sign Up</button> -->
   <h1 class="display-4 text-center">Dashboard</h1>
   <p class="lead text-center">What would you like to do today?</p>
-  <button routerLink="/new-poll" type="button" class="btn btn-success">New Poll</button>
-  <button routerLink="/user-polls" type="button" class="btn btn-primary">My Polls</button>
+  <ng-template [ngIf]="user" [ngIfElse]="signIn">
+    <button routerLink="/new-poll" type="button" class="btn btn-success">New Poll</button>
+    <button routerLink="/user-polls" type="button" class="btn btn-primary">My Polls</button>
+  </ng-template>
+  <ng-template #signIn>
+    <button type="button" routerLink="/sign-in" class="btn btn-secondary" data-dismiss="modal">Sign in</button>
+    <button type="button" routerLink="/sign-up" class="btn btn-secondary" data-dismiss="modal">Sign up</button>
+  </ng-template>
 </div>

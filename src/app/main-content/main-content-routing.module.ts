@@ -13,7 +13,7 @@ export const mainRoutes: Routes = [
   { path: 'feedback', component: FeedbackComponent },
   { path: 'poll-vote', component: PollVoteComponent },
   { path: 'result', component: ResultComponent },
-  { path: 'user-polls', component: UserPollsComponent },
+  { path: 'user-polls', component: UserPollsComponent, canActivate: [AuthGuardService] },
   { path: '**', redirectTo: '' }
 ];
 

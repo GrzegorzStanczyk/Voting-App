@@ -1,10 +1,16 @@
 
 <nav>
-  <app-navigation  class="navbar navbar-expand-lg navbar-light bg-light justify-content-between"></app-navigation>
+  <app-navigation
+    [user]="user$ | async"
+    class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+  </app-navigation>
 </nav>
 
 <header>
- <app-dashboard class="jumbotron jumbotron-fluid d-flex justify-items-center"></app-dashboard>
+  <app-dashboard
+    [user]="user$ | async"
+    class="jumbotron jumbotron-fluid d-flex justify-items-center">
+  </app-dashboard>
 </header>
 
 <a routerLink="/feedback">Feedback</a>
