@@ -5,7 +5,7 @@ import {
   ComponentFactory,
   OnInit} from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { AppState } from './app.component.rx';
+import { AppState, UserSingInAction } from './app.component.rx';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ModalComponent } from './modal/modal.component';
 
@@ -46,8 +46,9 @@ export class AppComponent implements OnInit {
       });
     }
   ngOnInit() {
-    const token = localStorage.getItem('jwt_token');
-    if (token) {
+    const token = localStorage.getItem('jwt_voting-app');
+    if (!!token) {
+      this.store.dispatch(new UserSingInAction(token));
     }
   }
 }

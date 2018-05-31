@@ -78,7 +78,7 @@ export class WebsocketService {
     this.socket.emit('add-new-user', user);
   }
 
-  signInUser(user: SignUp) {
+  signInUser(user: SignUp | string) {
     console.log('SIGN IN USER: ');
     this.socket.emit('sign-in-user', user);
   }

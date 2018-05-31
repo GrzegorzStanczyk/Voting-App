@@ -100,7 +100,7 @@ export class UserSingUpAction implements Action {
 export class UserSingInAction implements Action {
   readonly type = USER_SIGN_IN;
 
-  constructor(public payload: SignUp) {}
+  constructor(public payload: SignUp | string) {}
 }
 
 export class UserSingedInAction implements Action {
@@ -295,7 +295,7 @@ export class PollEffects {
   @Effect()
   onSignedIn$: Observable<AppActions> = this.websocketService.userSignedIn$.pipe(
     switchMap(user => {
-      localStorage.setItem('jwt_token', user.token);
+      localStorage.setItem('jwt_voting-app', user.token);
       this.router.navigate(['/']);
       return [new AppPendingAction(false), new UserSingedInAction(user)];
     })
@@ -305,7 +305,7 @@ export class PollEffects {
   onUserLogOut$ = this.actions$.pipe(
     ofType(USER_LOG_OUT),
     tap(() => {
-      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('jwt_voting-app');
       this.router.navigate(['/']);
     })
   );

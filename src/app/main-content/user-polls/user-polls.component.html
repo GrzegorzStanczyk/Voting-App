@@ -1,4 +1,4 @@
-<div id="accordion" *ngIf="(userPolls$ | async) as userPolls; else loading">
+<div id="accordion" *ngIf="(userPolls$ | async) as userPolls">
   <div class="card" *ngFor="let poll of userPolls; index as i; trackBy: trackByFn">
     <div class="card-header d-flex justify-content-between" id="headingOne">
       <h5 class="mb-0">
@@ -30,7 +30,3 @@
     </div>
   </div>
 </div>
-
-<ng-template #loading>
-  Loading stuf...
-</ng-template>

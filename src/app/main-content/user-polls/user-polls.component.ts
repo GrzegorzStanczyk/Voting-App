@@ -3,6 +3,7 @@ import { Store, select } from '@ngrx/store';
 
 import { Poll, AppState, UserDeletePollAction, GetUserPollsAction, DisconnectFromPollAction } from 'app/app.component.rx';
 import { Observable, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-polls',
@@ -16,7 +17,7 @@ export class UserPollsComponent implements OnInit, OnDestroy {
   collapse: boolean[] = [];
 
   constructor(private store: Store<AppState>) {
-    this.userPolls$ = store.pipe(select(state => state.voteApp.userPolls));
+    this.userPolls$ = store.pipe(select(state => state.voteApp.userPolls), filter(r => !!r));
     this.userPollsSubscription = this.userPolls$.subscribe(polls => this.rooms = polls.map(p => p._id));
    }
 

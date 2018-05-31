@@ -81,7 +81,26 @@ exports.init = (server, dbs) => {
     });
 
     socket.on('sign-in-user', data => {
-      dbs.collection('users').findOne({ email: data.email }, (err, result) => {
+      let email;
+      if (typeof(data) === 'string' && data.length > 0) {
+        try {
+          email = jwt.verify(data, process.env.SECRET).user.email;
+        } catch (err) {
+          console.log('INVALID TOKEN');
+          return socket.emit('message', 'Invalid login credentials');
+        }
+      } else if (typeof(data) === 'object') {
+        if (!validator.isEmail(data.email)) {
+          console.log('INVALID SIGN UP EMAIL');
+          return socket.emit('message', 'Invalid email');
+        }
+        if (!validator.isLength(data.password, 4)) {
+          console.log('INVALID SIGN UP PASSWORD LENGTH');
+          return socket.emit('message', 'Invalid password length');
+        }
+        email = data.email;
+      }
+      dbs.collection('users').findOne({ email }, (err, result) => {
         if (err) {
           console.log('DBS LOGIN ERROR: ', err);
           return socket.emit('message', 'Database error');
@@ -91,7 +110,7 @@ exports.init = (server, dbs) => {
           return socket.emit('message', 'Invalid login credentials');
         }
         const { name, email, _id, password} = result;
-        if (!bcrypt.compareSync(data.password, password)) {
+        if (!typeof(data === 'string') && !bcrypt.compareSync(data.password, password)) {
           console.log('USER INSERT INCORRECT PASSWORD');
           return socket.emit('message', 'Invalid login credentials');
         }
