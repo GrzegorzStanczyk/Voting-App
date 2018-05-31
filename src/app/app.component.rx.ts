@@ -294,11 +294,10 @@ export class PollEffects {
 
   @Effect()
   onSignedIn$: Observable<AppActions> = this.websocketService.userSignedIn$.pipe(
-    tap(user => this.store.dispatch(new AppPendingAction(false))),
-    map(user => {
+    switchMap(user => {
       localStorage.setItem('jwt_token', user.token);
       this.router.navigate(['/']);
-      return new UserSingedInAction(user);
+      return [new AppPendingAction(false), new UserSingedInAction(user)];
     })
   );
 
