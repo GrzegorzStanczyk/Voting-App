@@ -3,7 +3,7 @@ import { Action, Store, select } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { switchMap, map, tap, mapTo } from 'rxjs/operators';
+import { switchMap, map, tap, mapTo, pluck } from 'rxjs/operators';
 import { WebsocketService } from './services/websocket.service';
 
 export interface Field {
@@ -221,7 +221,7 @@ export class PollEffects {
   @Effect()
   onAddPoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(USER_ADD_NEW_POLL),
-    map((action: UserAddNewPollAction) => action.payload),
+    pluck('payload'),
     tap((poll: Poll) => this.websocketService.addNewPoll(poll)),
     mapTo(new AppPendingAction(true))
   );
@@ -234,8 +234,8 @@ export class PollEffects {
   @Effect()
   onConnectToPoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(CONNECT_TO_POLL),
-    map((action: ConnectToPollAction) => action.payload),
-    tap(pollUrl => this.websocketService.connectToPoll(pollUrl)),
+    pluck('payload'),
+    tap((pollUrl: string) => this.websocketService.connectToPoll(pollUrl)),
     mapTo(new AppPendingAction(true))
   );
 
@@ -255,8 +255,8 @@ export class PollEffects {
   @Effect({ dispatch: false })
   onDisconnectFromPoll$ = this.actions$.pipe(
     ofType(DISCONNECT_FORM_POLL),
-    map((action: DisconnectFromPollAction) => action.payload),
-    tap(pollUrl => this.websocketService.disconnectFormPoll(pollUrl))
+    pluck('payload'),
+    tap((pollUrl: string) => this.websocketService.disconnectFormPoll(pollUrl))
   );
 
   @Effect()
@@ -272,23 +272,23 @@ export class PollEffects {
   @Effect({ dispatch: false })
   onUserVote$ = this.actions$.pipe(
     ofType(USER_VOTE),
-    map((action: UserVoteAction) => action.payload),
+    pluck('payload'),
     tap(payload => this.websocketService.sendVote(payload))
   );
 
   @Effect()
   onSignUp$: Observable<UserSingUpAction | AppPendingAction> = this.actions$.pipe(
     ofType(USER_SIGN_UP),
-    map((action: UserSingUpAction) => action.payload),
-    tap((data) => this.websocketService.addNewUser(data)),
+    pluck('payload'),
+    tap((data: SignUp) => this.websocketService.addNewUser(data)),
     mapTo(new AppPendingAction(true))
   );
 
   @Effect()
   onSignIn$: Observable<UserSingInAction | AppPendingAction> = this.actions$.pipe(
     ofType(USER_SIGN_IN),
-    map((action: UserSingInAction) => action.payload),
-    tap((data) => this.websocketService.signInUser(data)),
+    pluck('payload'),
+    tap((data: SignUp | string) => this.websocketService.signInUser(data)),
     mapTo(new AppPendingAction(true))
   );
 
@@ -320,7 +320,7 @@ export class PollEffects {
   @Effect()
   onUserDeletePoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(USER_DELETE_POLL),
-    map((action: UserDeletePollAction) => action.payload),
+    pluck('payload'),
     tap((poll: Poll) => this.websocketService.deletePoll(poll)),
     mapTo(new AppPendingAction(true))
   );
