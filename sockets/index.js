@@ -16,19 +16,10 @@ exports.init = (server, dbs) => {
   io.on('connection', socket => {
     console.log('SOCKET CONNECTED');
 
-    var address = socket.handshake.address;
-    console.log('address: ', address);
-
-    var address2 = socket.request.connection.remoteAddress;
-    console.log('address2: ', address2);
-
-    var address4 = socket.request.client._peername.address;
-    console.log('address4: ', address4);
-
     socket.on('add-new-poll', (data, token) => {
       if (token && token.length > 0) {
         try {
-          const { name, _id } = jwt.verify(token, process.env.SECRET);
+          const { name, _id } = jwt.verify(token, process.env.SECRET).user;
           data.author = name;
           data.user_id = ObjectId(_id);
           data.fields = data.fields.map(f => ({name: f.name, votes: 0}));
@@ -52,12 +43,12 @@ exports.init = (server, dbs) => {
               console.log('NEW POLL ADDED');
           })
         } catch (err) {
-          console.log('INVALID TOKEN');
+          console.log('INVALID TOKEN', err);
           return socket.emit('message', 'Invalid login credentials');
         }
       } else if (!token) {
         console.log('USER TRY INVALID ACTION');
-        return socket.emit('message', 'TO add new poll, first Sign In');
+        return socket.emit('message', 'To add new poll, first Sign In');
       }
     });
   
@@ -95,7 +86,7 @@ exports.init = (server, dbs) => {
         try {
           email = jwt.verify(data, process.env.SECRET).user.email;
         } catch (err) {
-          console.log('INVALID TOKEN');
+          console.log('INVALID TOKEN', err);
           return socket.emit('message', 'Invalid login credentials');
         }
       } else if (typeof(data) === 'object') {
@@ -129,28 +120,40 @@ exports.init = (server, dbs) => {
       })
     })
 
-    socket.on('get_user_polls', data => {
-      dbs.collection('users').aggregate([
-        {
-          $lookup: 
-          {
-              from: 'polls',
-              localField: '_id',
-              foreignField: 'user_id',
-              as: 'user_polls'
-          }
-        },
-        { $match: { _id: ObjectId(_id) }}
-      ])
-      .next((err, result) => {
-        if (err) throw err;
-        if (!result) {
-          console.log('NO POLLS IN DATABASE');
-          return socket.emit('message', 'You don`t have any polls stored');
+    socket.on('get_user_polls', token => {
+      if (token && token.length > 0) {
+        try {
+          const _id = jwt.verify(token, process.env.SECRET).user._id;
+          dbs.collection('users').aggregate([
+            {
+              $lookup: 
+              {
+                  from: 'polls',
+                  localField: '_id',
+                  foreignField: 'user_id',
+                  as: 'user_polls'
+              }
+            },
+            { $match: { _id: ObjectId(_id) }}
+          ])
+          .next((err, result) => {
+            if (err) throw err;
+            if (!result) {
+              console.log('NO POLLS IN DATABASE');
+              return socket.emit('message', 'You don`t have any polls stored');
+            }
+            console.log('USER REQUEST POLLS');
+            socket.emit('user_polls', result.user_polls);
+            result.user_polls.forEach(r => connectToPoll(r._id, dbs, socket));
+          });
+        } catch (err) {
+          console.log('INVALID TOKEN', err);
+          return socket.emit('message', 'Invalid login credentials');
         }
-        socket.emit('user_polls', result);
-        result.user_polls.forEach(r => connectToPoll(r._id, dbs, socket));
-      });
+      } else if (!token) {
+        console.log('USER TRY INVALID ACTION');
+        return socket.emit('message', 'To your polls, first Sign In');
+      }
     })
 
     socket.on('connect to poll', room => {
@@ -162,9 +165,17 @@ exports.init = (server, dbs) => {
       const { _id } = payload.poll
       getNextSequence(`${_id}${payload.index}`, dbs)
       .then(votes => {
+        var address = socket.handshake.address;
+        console.log('address: ', address);
+
+        var address2 = socket.request.connection.remoteAddress;
+        console.log('address2: ', address2);
+
+        var address4 = socket.request.client._peername.address;
+        console.log('address4: ', address4);
+
         dbs.collection('polls').findAndModify(
-          // { _id: ObjectId(_id), usersVotedIP: { $ne: address2 } },
-          { _id: ObjectId(_id) },
+          { _id: ObjectId(_id), usersVotedIP: { $ne: address2 } },
           [],
           { 
             $set: { ["fields." + payload.index + ".votes"]: votes.value.seq }, 

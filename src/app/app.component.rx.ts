@@ -42,7 +42,7 @@ export interface AppState  {
 
 const initialState: VoteApp  = {
   user: null,
-  userPolls: null,
+  userPolls: [],
   poll: null,
   pending: false,
   modalMsg: ''
@@ -245,13 +245,15 @@ export class PollEffects {
   @Effect()
   onGetUserPolls$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(GET_USER_POLLS),
-    tap(() => this.websocketService.getUserPolls()),
+    tap(() => {
+      const token = localStorage.getItem('jwt_voting-app');
+      this.websocketService.getUserPolls(token);
+    }),
     mapTo(new AppPendingAction(true))
   );
 
   @Effect()
   onUserPollsReceived$: Observable<AppActions> = this.websocketService.userPollsReceived$.pipe(
-    map(res => res.user_polls),
     switchMap(polls => [new AppPendingAction(false), new ReceivedUserPollsAction(polls)])
   );
 
@@ -299,7 +301,7 @@ export class PollEffects {
   onSignedIn$: Observable<AppActions> = this.websocketService.userSignedIn$.pipe(
     switchMap(user => {
       localStorage.setItem('jwt_voting-app', user.token);
-      this.router.navigate(['/']);
+      // this.router.navigate(['/']);
       return [new AppPendingAction(false), new UserSingedInAction(user)];
     })
   );

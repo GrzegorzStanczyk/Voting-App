@@ -64,7 +64,8 @@ export class WebsocketService {
 
     this.socket.on('delete poll success', () => {
       console.log('DELETE SUCCESS');
-      this.getUserPolls();
+      const token = localStorage.getItem('jwt_voting-app');
+      this.getUserPolls(token);
     });
   }
 
@@ -88,9 +89,9 @@ export class WebsocketService {
     this.socket.emit('connect to poll', url);
   }
 
-  getUserPolls() {
+  getUserPolls(token: string) {
     console.log('GET USER POLLS');
-    this.socket.emit('get_user_polls');
+    this.socket.emit('get_user_polls', token);
   }
 
   disconnectFormPoll(url: string) {
