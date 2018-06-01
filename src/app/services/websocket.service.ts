@@ -68,13 +68,13 @@ export class WebsocketService {
     });
   }
 
-  addNewPoll(poll: Poll) {
+  addNewPoll(poll: Poll, token: string) {
     console.log('USER SEND NEW POLL: ', poll);
-    this.socket.emit('add-new-poll', poll);
+    this.socket.emit('add-new-poll', poll, token);
   }
 
   addNewUser(user: SignUp) {
-    console.log('ADD NEW USER: ', user);
+    console.log('ADD NEW USER');
     this.socket.emit('add-new-user', user);
   }
 

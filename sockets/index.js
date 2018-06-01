@@ -7,8 +7,6 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
 let io = null;
-const auth = 'Grzegorz';
-const _id = '5af9f1ea790b260380da5e0e'
 
 exports.io = () => io;
 
@@ -27,29 +25,40 @@ exports.init = (server, dbs) => {
     var address4 = socket.request.client._peername.address;
     console.log('address4: ', address4);
 
-    socket.on('add-new-poll', data => {
-      data.author = auth;
-      data.user_id = ObjectId(_id);
-      data.fields = data.fields.map(f => ({name: f.name, votes: 0}));
-      data.usersVotedIP = [];
-      dbs.collection('polls').insert(data)
-      .catch(err => {
-        console.log('DBS INSERT ERROR: ', err);
-        socket.emit('new-poll-added', {
-          error: 'Database connection error'
-        });
-      })
-      .then(res => {
-          const { fields, _id } = res.ops[0];
-          fields.forEach((p, i) => {
-            dbs.collection('counters').insert({ counter: `${_id}${i}`, seq: 0 })
-            .catch(err => console.log('COUNTERS INSERT ERROR: ', err))
-            .then(() => console.log(`ADDED COUNTER: ${_id}${i}`))
+    socket.on('add-new-poll', (data, token) => {
+      if (token && token.length > 0) {
+        try {
+          const { name, _id } = jwt.verify(token, process.env.SECRET);
+          data.author = name;
+          data.user_id = ObjectId(_id);
+          data.fields = data.fields.map(f => ({name: f.name, votes: 0}));
+          data.usersVotedIP = [];
+          dbs.collection('polls').insert(data)
+          .catch(err => {
+            console.log('DBS INSERT ERROR: ', err);
+            socket.emit('new-poll-added', {
+              error: 'Database connection error'
+            });
           })
-          socket.emit('new-poll-added', _id);
-          socket.emit('message', 'Well done! You successful added new poll');
-          console.log('NEW POLL ADDED');
-      })
+          .then(res => {
+              const { fields, _id } = res.ops[0];
+              fields.forEach((p, i) => {
+                dbs.collection('counters').insert({ counter: `${_id}${i}`, seq: 0 })
+                .catch(err => console.log('COUNTERS INSERT ERROR: ', err))
+                .then(() => console.log(`ADDED COUNTER: ${_id}${i}`))
+              })
+              socket.emit('new-poll-added', _id);
+              socket.emit('message', 'Well done! You successful added new poll');
+              console.log('NEW POLL ADDED');
+          })
+        } catch (err) {
+          console.log('INVALID TOKEN');
+          return socket.emit('message', 'Invalid login credentials');
+        }
+      } else if (!token) {
+        console.log('USER TRY INVALID ACTION');
+        return socket.emit('message', 'TO add new poll, first Sign In');
+      }
     });
   
     socket.on('add-new-user', data => {

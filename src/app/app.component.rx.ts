@@ -222,7 +222,10 @@ export class PollEffects {
   onAddPoll$: Observable<AppPendingAction> = this.actions$.pipe(
     ofType(USER_ADD_NEW_POLL),
     pluck('payload'),
-    tap((poll: Poll) => this.websocketService.addNewPoll(poll)),
+    tap((poll: Poll) => {
+      const token = localStorage.getItem('jwt_voting-app');
+      this.websocketService.addNewPoll(poll, token);
+    }),
     mapTo(new AppPendingAction(true))
   );
 
