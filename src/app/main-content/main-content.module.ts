@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NewPollComponent } from './new-poll/new-poll.component';
 import { PollVoteComponent } from './poll-vote/poll-vote.component';
-import { FeedbackComponent } from './feedback/feedback.component';
 import { ResultComponent } from './result/result.component';
 import { UserPollsComponent } from './user-polls/user-polls.component';
 import { PollResultComponent } from './result/poll-result/poll-result.component';
@@ -16,7 +15,6 @@ import { MainContentRoutingModule } from './main-content-routing.module';
   declarations: [
     NewPollComponent,
     PollVoteComponent,
-    FeedbackComponent,
     ResultComponent,
     UserPollsComponent,
     PollResultComponent,
