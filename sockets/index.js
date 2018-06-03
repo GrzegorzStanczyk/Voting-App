@@ -213,7 +213,7 @@ exports.init = (server, dbs) => {
           console.log('DELETE FIELD ERROR: ', err); 
           return socket.emit('message', 'Deleting poll error');
         } else {
-          console.log('FIELD DELETE SUCCESS: ');
+          console.log('POLL DELETE SUCCESS: ');
           socket.emit('delete poll success')
           const reg = new RegExp(_id)
           dbs.collection('counters').deleteMany({ counter: reg }, (err, doc) => {
