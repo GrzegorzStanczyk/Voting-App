@@ -80,27 +80,38 @@ exports.init = (server, dbs) => {
       })
     });
 
-    socket.on('sign-in-user', data => {
-      let email;
-      if (typeof(data) === 'string' && data.length > 0) {
+    socket.on('check-authentication', token => {
+      if (typeof(token) === 'string' && token.length > 0) {
         try {
-          email = jwt.verify(data, process.env.SECRET).user.email;
+          const email = jwt.verify(token, process.env.SECRET).user.email;
+          dbs.collection('users').findOne({ email }, (err, result) => {
+            if (err) {
+              console.log('DBS LOGIN ERROR: ', err);
+            }
+            if (!result) {
+              console.log('USER DONT EXIST IN DATABASE');
+            }
+            const { name, email, _id } = result;
+            const token = jwt.sign({user: { name, email, _id}}, process.env.SECRET);
+            console.log('USER SIGN IN SUCCESS');
+            return socket.emit('authenticated', {name, email, token, _id });
+          })
         } catch (err) {
           console.log('INVALID TOKEN', err);
-          return socket.emit('message', 'Invalid login credentials');
         }
-      } else if (typeof(data) === 'object') {
-        if (!validator.isEmail(data.email)) {
-          console.log('INVALID SIGN UP EMAIL');
-          return socket.emit('message', 'Invalid email');
-        }
-        if (!validator.isLength(data.password, 4)) {
-          console.log('INVALID SIGN UP PASSWORD LENGTH');
-          return socket.emit('message', 'Invalid password length');
-        }
-        email = data.email;
       }
-      dbs.collection('users').findOne({ email }, (err, result) => {
+    })
+    
+    socket.on('sign-in-user', data => {
+      if (!validator.isEmail(data.email)) {
+        console.log('INVALID SIGN UP EMAIL');
+        return socket.emit('message', 'Invalid email');
+      }
+      if (!validator.isLength(data.password, 4)) {
+        console.log('INVALID SIGN UP PASSWORD LENGTH');
+        return socket.emit('message', 'Invalid password length');
+      }
+      dbs.collection('users').findOne({ email: data.email }, (err, result) => {
         if (err) {
           console.log('DBS LOGIN ERROR: ', err);
           return socket.emit('message', 'Database error');

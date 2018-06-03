@@ -58,6 +58,7 @@ const RECEIVED_USER_POLLS = 'RECEIVED_USER_POLLS';
 const USER_SIGN_UP = 'USER_SIGN_UP';
 const USER_SIGN_IN = 'USER_SIGN_IN';
 const USER_SIGNED_IN = 'USER_SIGNED_IN';
+const CHECK_AUTHENTICATION = 'CHECK_AUTHENTICATION';
 const USER_LOG_OUT = 'USER_LOG_OUT';
 const CONNECT_TO_POLL = 'CONNECT_TO_POLL';
 const MESSAGE_FROM_SERVER = 'MESSAGE_FROM_SERVER';
@@ -100,7 +101,10 @@ export class UserSingUpAction implements Action {
 export class UserSingInAction implements Action {
   readonly type = USER_SIGN_IN;
 
-  constructor(public payload: SignUp | string) {}
+  constructor(public payload: SignUp) {}
+}
+export class CheckAuthenticationAction implements Action {
+  readonly type = CHECK_AUTHENTICATION;
 }
 
 export class UserSingedInAction implements Action {
@@ -165,6 +169,7 @@ export type AppActions =
   | UserSingUpAction
   | UserSingedInAction
   | UserSingInAction
+  | CheckAuthenticationAction
   | UserLogOutnAction
   | ConnectToPollAction
   | MessageFromServerAction
@@ -293,7 +298,7 @@ export class PollEffects {
   onSignIn$: Observable<UserSingInAction | AppPendingAction> = this.actions$.pipe(
     ofType(USER_SIGN_IN),
     pluck('payload'),
-    tap((data: SignUp | string) => this.websocketService.signInUser(data)),
+    tap((data: SignUp) => this.websocketService.signInUser(data)),
     mapTo(new AppPendingAction(true))
   );
 
@@ -301,9 +306,20 @@ export class PollEffects {
   onSignedIn$: Observable<AppActions> = this.websocketService.userSignedIn$.pipe(
     switchMap(user => {
       localStorage.setItem('jwt_voting-app', user.token);
-      // this.router.navigate(['/']);
+      this.router.navigate(['/']);
       return [new AppPendingAction(false), new UserSingedInAction(user)];
     })
+  );
+
+  @Effect({ dispatch: false })
+  onCheckAuthentication$ = this.actions$.pipe(
+    ofType<CheckAuthenticationAction>(CHECK_AUTHENTICATION),
+    tap(() => this.websocketService.checkAuthentication())
+  );
+
+  @Effect()
+  onAuthenticated$: Observable<UserSingedInAction> = this.websocketService.checkAuthentication$.pipe(
+    map(user => new UserSingedInAction(user))
   );
 
   @Effect()

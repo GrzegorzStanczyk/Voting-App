@@ -13,6 +13,7 @@ export class WebsocketService {
   private newPollAddedSource = new Subject<string>();
   private newUserAddedSource = new Subject<User>();
   private userSignedInSource = new Subject<User>();
+  private checkAuthenticationSource = new Subject<User>();
   private pollReceivedSource = new Subject<Poll>();
   private messageFromServerSource = new Subject<string>();
   private userPollsReceivedSource = new Subject<any>();
@@ -20,6 +21,7 @@ export class WebsocketService {
   newPollAdded$: Observable<string> = this.newPollAddedSource.asObservable();
   newUserAdded$: Observable<User> = this.newUserAddedSource.asObservable();
   userSignedIn$: Observable<User> = this.userSignedInSource.asObservable();
+  checkAuthentication$: Observable<User> = this.checkAuthenticationSource.asObservable();
   pollReceived$: Observable<Poll> = this.pollReceivedSource.asObservable();
   messageFromServer$: Observable<string> = this.messageFromServerSource.asObservable();
   userPollsReceived$: Observable<any> = this.userPollsReceivedSource.asObservable();
@@ -40,6 +42,11 @@ export class WebsocketService {
     this.socket.on('user-login-success', user => {
       console.log('USER SIGNED IN');
       this.userSignedInSource.next(user);
+    });
+
+    this.socket.on('authenticated', user => {
+      console.log('USER AUTHENTICATED');
+      this.checkAuthenticationSource.next(user);
     });
 
     this.socket.on('connected to poll', poll => {
@@ -79,9 +86,17 @@ export class WebsocketService {
     this.socket.emit('add-new-user', user);
   }
 
-  signInUser(user: SignUp | string) {
-    console.log('SIGN IN USER: ');
+  signInUser(user: SignUp) {
+    console.log('SIGN IN USER');
     this.socket.emit('sign-in-user', user);
+  }
+
+  checkAuthentication() {
+    const token = localStorage.getItem('jwt_voting-app');
+    if (!!token) {
+      console.log('CHECK_AUTHENTICATION');
+      this.socket.emit('check-authentication', token);
+    }
   }
 
   connectToPoll(url: string) {
