@@ -1,16 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CreditsComponent } from '../credits/credits.component';
+import { DashboardComponent } from '../dashboard/dashboard.component';
+import { AppRoutingModule } from '../app-routing.module';
+import { NavigationComponent } from '../navigation/navigation.component';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    AppRoutingModule
   ],
   exports: [
-    CreditsComponent
+    CreditsComponent,
+    DashboardComponent
   ],
   declarations: [
-    CreditsComponent
+    CreditsComponent,
+    DashboardComponent
   ]
 })
 export class CoreModule { }

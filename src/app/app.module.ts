@@ -12,7 +12,6 @@ import { environment } from '../environments/environment';
 import { appReducer, PollEffects } from './app.component.rx';
 
 import { AppComponent } from './app.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AuthComponent } from './auth/auth.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
@@ -28,7 +27,6 @@ import { CoreModule } from './core/core.module';
     AuthComponent,
     SignUpComponent,
     NavigationComponent,
-    DashboardComponent,
     SpinnerComponent,
     ModalComponent,
     SignInComponent
