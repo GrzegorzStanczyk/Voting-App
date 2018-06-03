@@ -12,7 +12,6 @@ import { environment } from '../environments/environment';
 import { appReducer, PollEffects } from './app.component.rx';
 
 import { AppComponent } from './app.component';
-import { CreditsComponent } from './credits/credits.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AuthComponent } from './auth/auth.component';
@@ -21,12 +20,12 @@ import { NavigationComponent } from './navigation/navigation.component';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ModalComponent } from './modal/modal.component';
 import { SignInComponent } from './auth/sign-in/sign-in.component';
+import { CoreModule } from './core/core.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthComponent,
-    CreditsComponent,
     SignUpComponent,
     NavigationComponent,
     DashboardComponent,
@@ -43,7 +42,8 @@ import { SignInComponent } from './auth/sign-in/sign-in.component';
     AppRoutingModule,
     MainContentModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    CoreModule
   ],
   entryComponents: [SpinnerComponent, ModalComponent],
   providers: [],
