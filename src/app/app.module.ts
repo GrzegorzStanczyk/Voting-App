@@ -6,30 +6,22 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { MainContentModule } from './main-content/main-content.module';
 import { AppRoutingModule } from './app-routing.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { environment } from '../environments/environment';
 import { appReducer, PollEffects } from './app.component.rx';
 
 import { AppComponent } from './app.component';
 
-import { AuthComponent } from './auth/auth.component';
-import { SignUpComponent } from './auth/sign-up/sign-up.component';
-import { NavigationComponent } from './navigation/navigation.component';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ModalComponent } from './modal/modal.component';
-import { SignInComponent } from './auth/sign-in/sign-in.component';
 import { CoreModule } from './core/core.module';
+import { AuthModule } from './auth/auth.module';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AuthComponent,
-    SignUpComponent,
-    NavigationComponent,
     SpinnerComponent,
     ModalComponent,
-    SignInComponent
   ],
   imports: [
     BrowserModule,
@@ -39,9 +31,8 @@ import { CoreModule } from './core/core.module';
     StoreDevtoolsModule.instrument(),
     AppRoutingModule,
     MainContentModule,
-    ReactiveFormsModule,
-    FormsModule,
-    CoreModule
+    CoreModule,
+    AuthModule
   ],
   entryComponents: [SpinnerComponent, ModalComponent],
   providers: [],

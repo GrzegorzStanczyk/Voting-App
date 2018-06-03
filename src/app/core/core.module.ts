@@ -4,6 +4,7 @@ import { CreditsComponent } from '../credits/credits.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { AppRoutingModule } from '../app-routing.module';
 import { NavigationComponent } from '../navigation/navigation.component';
+import { AuthModule } from '../auth/auth.module';
 
 @NgModule({
   imports: [
