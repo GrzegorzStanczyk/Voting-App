@@ -163,7 +163,7 @@ exports.init = (server, dbs) => {
         }
       } else if (!token) {
         console.log('USER TRY INVALID ACTION');
-        return socket.emit('message', 'To your polls, first Sign In');
+        return socket.emit('message', 'To get your polls, first Sign In');
       }
     })
 

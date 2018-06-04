@@ -50,7 +50,7 @@ export class WebsocketService {
     });
 
     this.socket.on('connected to poll', poll => {
-      console.log('CONNECTED TO POLL: ', poll);
+      console.log('CONNECTED TO POLL');
       this.pollReceivedSource.next(poll);
     });
 
@@ -60,7 +60,7 @@ export class WebsocketService {
     });
 
     this.socket.on('user_polls', data => {
-      console.log('GET USER POLLS', data);
+      console.log('USER POLLS RECEIVED');
       this.userPollsReceivedSource.next(data);
     });
 
@@ -77,7 +77,7 @@ export class WebsocketService {
   }
 
   addNewPoll(poll: Poll, token: string) {
-    console.log('USER SEND NEW POLL: ', poll);
+    console.log('USER SEND NEW POLL');
     this.socket.emit('add-new-poll', poll, token);
   }
 
