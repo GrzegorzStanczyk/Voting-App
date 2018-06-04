@@ -3,25 +3,24 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { MainContentModule } from './main-content/main-content.module';
 import { AppRoutingModule } from './app-routing.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { MainContentModule } from './main-content/main-content.module';
+import { CoreModule } from './core/core.module';
+import { AuthModule } from './auth/auth.module';
 
 import { environment } from '../environments/environment';
 import { appReducer, PollEffects } from './app.component.rx';
 
 import { AppComponent } from './app.component';
-
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ModalComponent } from './modal/modal.component';
-import { CoreModule } from './core/core.module';
-import { AuthModule } from './auth/auth.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     SpinnerComponent,
-    ModalComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,
