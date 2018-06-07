@@ -1,5 +1,5 @@
 <button 
-  (click)="show = !show"
+  (click)="toggle = !toggle"
   class="navbar-toggler ml-auto" 
   type="button" 
   data-toggle="collapse" 
@@ -10,7 +10,7 @@
   <span class="navbar-toggler-icon"></span>
 </button>
 <div 
-  [ngClass]="{'show': show}"
+  [ngClass]="{'toggle': toggle}"
   class="collapse navbar-collapse" 
   id="navbarNavDropdown">
   <ul class="navbar-nav ml-auto">

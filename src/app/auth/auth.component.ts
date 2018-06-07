@@ -10,6 +10,8 @@ import { Observable } from 'rxjs';
 })
 export class AuthComponent {
   @Input() user: User;
+  toggle: boolean;
+
   constructor(private store: Store<AppState>) { }
 
   logOut() {
